@@ -17,9 +17,9 @@ public class KeyboardGridShipController : MonoBehaviour
     {
         // get grid bounds from GameManager
         GameManager gm  = FindObjectOfType<GameManager>();
-        sizeX = gm.getSizeX();
-        sizeY = gm.getSizeY();
-        sizeZ = gm.getSizeZ();
+        sizeX = gm.GetSizeX();
+        sizeY = gm.GetSizeY();
+        sizeZ = gm.GetSizeZ();
 
 
         gridPos = new GridPosition(0, 0, 0);
