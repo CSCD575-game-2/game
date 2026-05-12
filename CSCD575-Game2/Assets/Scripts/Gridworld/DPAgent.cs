@@ -1,23 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DPAgent
+public class DPAgent : RLAgent
 {
-    private readonly GridWorldEnvironment env;
-    private readonly float gamma;
-    private readonly float theta;
 
     public readonly Dictionary<GridPosition, float> values = new();
-    public readonly Dictionary<GridPosition, string> policy = new();
 
-    public DPAgent(GridWorldEnvironment env, float gamma = 0.9f, float theta = 0.000001f)
+    public DPAgent(GridWorldEnvironment env, float gamma = 0.9f, float theta = 0.000001f) : base(env, gamma, theta)
     {
-        this.env = env;
-        this.gamma = gamma;
-        this.theta = theta;
     }
 
-    public void Train()
+
+    public override void Train()
     {
         for (int x = 0; x < env.sizeX; x++)
         {
@@ -74,7 +68,7 @@ public class DPAgent
         }
     }
 
-    public void ExtractPolicy()
+    public override void ExtractPolicy()
     {
         for (int x = 0; x < env.sizeX; x++)
         {
@@ -118,4 +112,5 @@ public class DPAgent
             }
         }
     }
+
 }

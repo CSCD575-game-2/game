@@ -1,13 +1,21 @@
-using System.Collections;
 using UnityEngine;
+using System.Collections;
 
 public class SpaceshipAgent : MonoBehaviour
 {
-    private GridWorldEnvironment env;
-    private DPAgent agent;
+    public BattleEnvironment env;
+    public IRLPolicy policy;
+    public ShipDirective directive;
+    public ShipRole role;
+    public ShipStatus status;
+    public GridPosition currentState;
 
-    private GridPosition currentState;
+    public GridPosition CurrentState => currentState;
 
+    public void Initialize(BattleEnvironment env)
+    {
+        this.env = env;
+    }
     [SerializeField] private float moveSpeed = 3f;
     [SerializeField] private float stepDelay = 0.5f;
     [SerializeField] private float spacing = 1.2f;
@@ -15,11 +23,10 @@ public class SpaceshipAgent : MonoBehaviour
     [SerializeField] private float rotateSpeed = 8f;
     [SerializeField] private Vector3 rotationOffsetEuler = Vector3.zero;
 
-    public void Initialize(GridWorldEnvironment env, DPAgent agent, float spacing)
+    public void Initialize(BattleEnvironment env, IRLPolicy policy, GridPosition startState)
     {
         this.env = env; 
-        this.agent = agent;
-        this.spacing = spacing;
+        this.policy = policy;
 
         // get spacing from GameManager
         GameManager gm = FindObjectOfType<GameManager>();
@@ -27,26 +34,29 @@ public class SpaceshipAgent : MonoBehaviour
             spacing = gm.GetSpacing();
         }
 
-        currentState = env.start;
-
-        transform.position = GridToWorld(currentState);
+        currentState = startState;
+        transform.position = env.GridToWorld(currentState);
 
         StartCoroutine(RunEpisode());
+        //RunEpisode();
     }
 
     IEnumerator RunEpisode()
     {
         int steps = 0;
 
-        while (!env.IsTerminal(currentState))
+        while (status == ShipStatus.Active)
         {
-            string action = agent.policy[currentState];
+            string action = policy.ChooseAction(this, env);
 
-            var (nextState, reward) = env.Step(currentState, action);
+            GridPosition nextState = env.GetNextState(currentState, action);
+            float reward = env.GetReward(this, currentState, action, nextState);
 
-            Debug.Log($"State: {currentState.x},{currentState.y},{currentState.z} | Action: {action} | Reward: {reward}");
+            policy.Learn(currentState, action, reward, nextState);
 
-            yield return MoveTo(GridToWorld(nextState));
+            Debug.Log($"{role} | State {currentState.x},{currentState.y},{currentState.z} | Action {action} | Reward {reward}");
+
+            yield return MoveTo(env.GridToWorld(nextState));
 
             currentState = nextState;
             steps++;
@@ -60,7 +70,7 @@ public class SpaceshipAgent : MonoBehaviour
             }
         }
 
-        Debug.Log("Episode finished");
+        Debug.Log($"{role} episode finished");
     }
 
     IEnumerator MoveTo(Vector3 target)
@@ -100,12 +110,22 @@ public class SpaceshipAgent : MonoBehaviour
         transform.position = target;
     }
 
-    Vector3 GridToWorld(GridPosition pos)
+    //Vector3 GridToWorld(GridPosition pos)
+    //{
+        //return new Vector3(
+            //pos.x * spacing,
+            //pos.y * spacing,
+            //pos.z * spacing
+        //);
+    //}
+
+    public void SetDirective(ShipDirective newDirective)
     {
-        return new Vector3(
-            pos.x * spacing,
-            pos.y * spacing,
-            pos.z * spacing
-        );
+        directive = newDirective;
+    }
+
+    public bool IsTerminal()
+    {
+        return status == ShipStatus.Destroyed || status == ShipStatus.Docked;
     }
 }
