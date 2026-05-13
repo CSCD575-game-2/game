@@ -9,6 +9,9 @@ public class SpaceshipAgent : MonoBehaviour
     public ShipDirective directive;
     public ShipRole role;
     public ShipStatus status;
+
+    [SerializeField] private int maxSteps = 100;
+
     public GridPosition currentState;
 
     public GridPosition CurrentState => currentState;
@@ -46,7 +49,7 @@ public class SpaceshipAgent : MonoBehaviour
     {
         int steps = 0;
 
-        while (status == ShipStatus.Active)
+        while (status == ShipStatus.Active || status == ShipStatus.ReturningHome)
         {
             string action = policy.ChooseAction(this, env);
 
@@ -60,15 +63,27 @@ public class SpaceshipAgent : MonoBehaviour
             yield return MoveTo(env.GridToWorld(nextState));
 
             currentState = nextState;
+
             steps++;
+            
+            if (status == ShipStatus.ReturningHome &&
+                env.IsAtPlayerMothership(currentState))
+            {
+                env.DockShip(this);
+                gameObject.SetActive(false); 
+                Debug.Log($"{role} docked at mothership");
+                break;
+            }
+
+            if (steps > maxSteps)
+            {
+                status = ShipStatus.Destroyed;
+                Debug.Log($"{role} destroyed: exceeded max steps");
+                break;
+            }
 
             yield return new WaitForSeconds(stepDelay);
 
-            if (steps > 100)
-            {
-                Debug.Log("Stopped: too many steps");
-                break;
-            }
         }
 
         Debug.Log($"{role} episode finished");
