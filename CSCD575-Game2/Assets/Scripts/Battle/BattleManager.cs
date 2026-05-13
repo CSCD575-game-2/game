@@ -81,6 +81,7 @@ public class BattleManager : MonoBehaviour
 
             ship.role = ShipRole.Fighter;
             ship.status = ShipStatus.Docked;
+            ship.team = ShipTeam.Player;
             ship.directive = ShipDirective.ReturnHome;
 
             ship.gameObject.SetActive(false);

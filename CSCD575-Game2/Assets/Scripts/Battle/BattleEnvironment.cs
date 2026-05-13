@@ -41,6 +41,7 @@ public class BattleEnvironment : MonoBehaviour
         }
         if (ship.role == ShipRole.Fighter &&
             ship.status == ShipStatus.Docked &&
+            ship.team == ShipTeam.Player &&
             !dockedFighters.Contains(ship))
         {
             dockedFighters.Add(ship);
@@ -87,10 +88,19 @@ public class BattleEnvironment : MonoBehaviour
         ship.status = ShipStatus.Docked;
 
         if (ship.role == ShipRole.Fighter &&
+            ship.team == ShipTeam.Player &&
             !dockedFighters.Contains(ship))
         {
             dockedFighters.Add(ship);
         }
+
+        if (ship.role == ShipRole.Fighter &&
+            ship.team == ShipTeam.Enemy &&
+            !dockedEnemyFighters.Contains(ship))
+        {
+            dockedEnemyFighters.Add(ship);
+        }
+
     }
 
     public Vector3 GridToWorld(GridPosition pos)
