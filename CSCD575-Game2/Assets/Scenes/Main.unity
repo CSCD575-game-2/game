@@ -3382,7 +3382,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3060088426372616897, guid: 481351381d17b144594f0cceef6ef608, type: 3}
       propertyPath: m_Name
-      value: F3_Red Variant
+      value: Mothership F3_Red Variant
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4542,7 +4542,7 @@ GameObject:
   - component: {fileID: 2004810530}
   - component: {fileID: 2004810529}
   m_Layer: 0
-  m_Name: ShipCamera
+  m_Name: MothershipCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4631,7 +4631,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2004810527}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &2004810532
 Camera:
   m_ObjectHideFlags: 0
@@ -4673,7 +4673,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
+  m_TargetTexture: {fileID: 8400000, guid: e2a12bb8298bd414399d4a21b0a9b874, type: 2}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
