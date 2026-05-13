@@ -3869,6 +3869,7 @@ MonoBehaviour:
   spacing: 1.2
   playerMothershipPrefab: {fileID: 35055236}
   enemyMothershipPrefab: {fileID: 423442723}
+  exploreExploitSlider: {fileID: 1264500385}
 --- !u!4 &1670555059
 Transform:
   m_ObjectHideFlags: 0

@@ -4,7 +4,8 @@ using System.Collections;
 public class SpaceshipAgent : MonoBehaviour
 {
     public BattleEnvironment env;
-    public IRLPolicy policy;
+    private IRLPolicy policy;
+    public IRLPolicy Policy => policy; 
     public ShipDirective directive;
     public ShipRole role;
     public ShipStatus status;

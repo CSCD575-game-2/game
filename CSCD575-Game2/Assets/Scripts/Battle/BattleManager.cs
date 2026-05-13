@@ -20,16 +20,32 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private GameObject playerMothershipPrefab;
     [SerializeField] private GameObject enemyMothershipPrefab;
 
+    [Header("Commander Dials")]
+    [SerializeField] private Slider exploreExploitSlider;
+
     private BattlePhase phase = BattlePhase.Deployment;
 
     private void Start()
     {
         deployFighterButton.interactable = false;
 
+        exploreExploitSlider.onValueChanged.AddListener(UpdateFleetEpsilon);
+
         startButton.onClick.AddListener(StartEpisode);
         deployFighterButton.onClick.AddListener(DeployFighter);
 
         SpawnMotherships();
+    }
+
+    private void UpdateFleetEpsilon(float value)
+    {
+        foreach (SpaceshipAgent ship in battleEnvironment.allShips)
+        {
+            if (ship.Policy is TDPolicy tdPolicy)
+            {
+                tdPolicy.Epsilon = value;
+            }
+        }
     }
 
     private void SpawnMotherships()
@@ -79,11 +95,19 @@ public class BattleManager : MonoBehaviour
 
         battleEnvironment.RegisterShip(ship);
 
+        float epsilon = exploreExploitSlider.value;
+
         IRLPolicy fighterPolicy = new TDPolicy(
             alpha: 0.2f,
             gamma: 0.9f,
-            epsilon: 0.5f
+            epsilon: epsilon
         );
+
+        //IRLPolicy fighterPolicy = new TDPolicy(
+            //alpha: 0.2f,
+            //gamma: 0.9f,
+            //epsilon: 0.5f
+        //);
 
         //GridPosition spawnState = new GridPosition(0, 0, 0);
         GridPosition spawnState = battleEnvironment.playerMothershipPosition;

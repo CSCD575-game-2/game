@@ -17,13 +17,16 @@ public class TDPolicy : IRLPolicy
 
     private readonly float alpha;
     private readonly float gamma;
-    private readonly float epsilon;
+
+    //private readonly float epsilon;
+    public float Epsilon { get; set; }
 
     public TDPolicy(float alpha = 0.2f, float gamma = 0.9f, float epsilon = 0.2f)
     {
         this.alpha = alpha;
         this.gamma = gamma;
-        this.epsilon = epsilon;
+        //this.epsilon = epsilon;
+        Epsilon = epsilon;
     }
 
     public string ChooseAction(SpaceshipAgent ship, BattleEnvironment env)
@@ -31,7 +34,7 @@ public class TDPolicy : IRLPolicy
         GridPosition state = ship.CurrentState;
 
         // explore
-        if (Random.value < epsilon)
+        if (Random.value < Epsilon)
         {
             return actions[Random.Range(0, actions.Length)];
         }
