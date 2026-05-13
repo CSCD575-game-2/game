@@ -10,12 +10,22 @@ public class BattleEnvironment : MonoBehaviour
     public int sizeZ { get; private set; }
     public float tileSpacing { get; private set; }
 
+    public GridPosition playerMothershipPosition;
+    public GridPosition enemyMothershipPosition;
+
     public void Initialize(int sizeX, int sizeY, int sizeZ, float tileSpacing)
     {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
         this.tileSpacing = tileSpacing;
+
+        playerMothershipPosition = new GridPosition(0, 0, 0);
+        enemyMothershipPosition = new GridPosition(
+            sizeX - 1,
+            sizeY - 1,
+            sizeZ - 1
+        );
     }
 
     public void RegisterShip(SpaceshipAgent ship)

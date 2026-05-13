@@ -17,6 +17,9 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Transform playerSpawnPoint;
     [SerializeField] private float spacing = 1.2f;
 
+    [SerializeField] private GameObject playerMothershipPrefab;
+    [SerializeField] private GameObject enemyMothershipPrefab;
+
     private BattlePhase phase = BattlePhase.Deployment;
 
     private void Start()
@@ -25,6 +28,27 @@ public class BattleManager : MonoBehaviour
 
         startButton.onClick.AddListener(StartEpisode);
         deployFighterButton.onClick.AddListener(DeployFighter);
+
+        SpawnMotherships();
+    }
+
+    private void SpawnMotherships()
+    {
+        Instantiate(
+            playerMothershipPrefab,
+            battleEnvironment.GridToWorld(
+                battleEnvironment.playerMothershipPosition
+            ),
+            Quaternion.identity
+        );
+
+        Instantiate(
+            enemyMothershipPrefab,
+            battleEnvironment.GridToWorld(
+                battleEnvironment.enemyMothershipPosition
+            ),
+            Quaternion.identity
+        );
     }
 
     public void StartEpisode()
@@ -61,7 +85,8 @@ public class BattleManager : MonoBehaviour
             epsilon: 0.5f
         );
 
-        GridPosition spawnState = new GridPosition(0, 0, 0);
+        //GridPosition spawnState = new GridPosition(0, 0, 0);
+        GridPosition spawnState = battleEnvironment.playerMothershipPosition;
 
         ship.Initialize(battleEnvironment, fighterPolicy, spawnState);
 
