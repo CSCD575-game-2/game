@@ -5,6 +5,7 @@ public class BattleEnvironment : MonoBehaviour
 {
     public readonly List<SpaceshipAgent> allShips = new();
     public readonly List<SpaceshipAgent> dockedFighters = new();
+    public readonly List<SpaceshipAgent> dockedEnemyFighters = new();
 
     public int sizeX { get; private set; }
     public int sizeY { get; private set; }
@@ -14,7 +15,8 @@ public class BattleEnvironment : MonoBehaviour
     public GridPosition playerMothershipPosition;
     public GridPosition enemyMothershipPosition;
 
-    public GridPosition CurrentGoal { get; private set; }
+    public GridPosition CurrentPlayerGoal { get; private set; }
+    public GridPosition CurrentEnemyGoal { get; private set; }
 
     public void Initialize(int sizeX, int sizeY, int sizeZ, float tileSpacing)
     {
@@ -43,11 +45,31 @@ public class BattleEnvironment : MonoBehaviour
         {
             dockedFighters.Add(ship);
         }
+
+        if (ship.role == ShipRole.Fighter &&
+            ship.team == ShipTeam.Enemy &&
+            ship.status == ShipStatus.Docked &&
+            !dockedEnemyFighters.Contains(ship))
+        {
+            dockedEnemyFighters.Add(ship);
+        }
     }
 
     public void UnregisterShip(SpaceshipAgent ship)
     {
         allShips.Remove(ship);
+    }
+
+    public SpaceshipAgent GetDockedEnemyFighter()
+    {
+        if (dockedEnemyFighters.Count == 0)
+            return null;
+
+        SpaceshipAgent ship = dockedEnemyFighters[0];
+
+        dockedEnemyFighters.RemoveAt(0);
+
+        return ship;
     }
 
     public SpaceshipAgent GetDockedFighter()
@@ -141,9 +163,19 @@ public class BattleEnvironment : MonoBehaviour
         GridPosition nextState)
     {
         float reward = -0.1f;
+        
+        GridPosition currentGoal;
+        if (ship.team == ShipTeam.Player)
+        {
+            currentGoal = CurrentPlayerGoal;
+        }
+        else
+        {
+            currentGoal = CurrentEnemyGoal;
+        }
 
-        int oldDistance = ManhattanDistance(state, CurrentGoal);
-        int newDistance = ManhattanDistance(nextState, CurrentGoal);
+        int oldDistance = ManhattanDistance(state, currentGoal);
+        int newDistance = ManhattanDistance(nextState, currentGoal);
 
         if (nextState.Equals(state))
         {
@@ -157,7 +189,7 @@ public class BattleEnvironment : MonoBehaviour
         if (newDistance > oldDistance)
             reward -= 1f;
 
-        if (nextState.Equals(CurrentGoal))
+        if (nextState.Equals(currentGoal))
             reward += 20f;
 
         //if (ship.role == ShipRole.Fighter)
@@ -183,22 +215,28 @@ public class BattleEnvironment : MonoBehaviour
 
     public void SetAttackGoal()
     {
-        CurrentGoal = enemyMothershipPosition;
+        CurrentEnemyGoal = playerMothershipPosition;
+        CurrentPlayerGoal = enemyMothershipPosition;
     }
 
     public void SetReturnHomeGoal()
     {
-        CurrentGoal = playerMothershipPosition;
+        CurrentEnemyGoal = enemyMothershipPosition;
+        CurrentPlayerGoal = playerMothershipPosition;
     }
 
-    public bool IsAtPlayerMothership(GridPosition pos)
+    public bool IsAtHomeMothership(SpaceshipAgent ship)
     {
-        return pos.Equals(playerMothershipPosition);
-    }
+        if (ship.team == ShipTeam.Player)
+        {
+            return ship.CurrentState.Equals(
+                playerMothershipPosition
+            );
+        }
 
-    //public bool IsTerminal()
-    //{
-        //return false;
-    //}
+        return ship.CurrentState.Equals(
+            enemyMothershipPosition
+        );
+    }
 
 }
