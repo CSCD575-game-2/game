@@ -5,7 +5,7 @@ public class TDPolicy : IRLPolicy
 {
     private readonly Dictionary<(GridPosition, string), float> qValues = new();
 
-    private readonly string[] actions =
+    private string[] actions =
     {
         "Up",
         "Down",
@@ -31,6 +31,18 @@ public class TDPolicy : IRLPolicy
 
     public string ChooseAction(SpaceshipAgent ship, BattleEnvironment env)
     {
+        if (env.sizeY == 1)
+        {
+            // 2D environment, remove "Up" and "Down" actions
+            this.actions = new string[]
+            {
+                "Left",
+                "Right",
+                "Forward",
+                "Back"
+            };
+        }
+
         GridPosition state = ship.CurrentState;
 
         // explore
@@ -40,7 +52,7 @@ public class TDPolicy : IRLPolicy
         }
 
         // exploit
-        string bestAction = actions[0];
+        string bestAction = actions[Random.Range(0, actions.Length)];
         float bestValue = float.NegativeInfinity;
 
         foreach (string action in actions)

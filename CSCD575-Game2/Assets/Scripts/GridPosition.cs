@@ -25,4 +25,9 @@ public struct GridPosition
 
     public static bool operator ==(GridPosition a, GridPosition b) => a.Equals(b);
     public static bool operator !=(GridPosition a, GridPosition b) => !a.Equals(b);
+
+    public override string ToString()
+    {
+        return $"({x}, {y}, {z})";
+    }
 }
