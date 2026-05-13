@@ -60,7 +60,7 @@ public class SpaceshipAgent : MonoBehaviour
 
             policy.Learn(currentState, action, reward, nextState);
 
-            Debug.Log($"{role} | State {currentState.x},{currentState.y},{currentState.z} | Action {action} | Reward {reward}");
+            //Debug.Log($"{role} | State {currentState.x},{currentState.y},{currentState.z} | Action {action} | Reward {reward}");
 
             yield return MoveTo(env.GridToWorld(nextState));
 

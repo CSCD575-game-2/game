@@ -4109,8 +4109,8 @@ MonoBehaviour:
   enemyFighterPrefab: {fileID: 1539822525}
   playerSpawnPoint: {fileID: 3102909751507431731}
   spacing: 1.2
-  startingFighters: 5
-  startingEnemyFighters: 5
+  startingFighters: 3
+  startingEnemyFighters: 3
   playerMothershipPrefab: {fileID: 3102909751507431730}
   enemyMothershipPrefab: {fileID: 645630378}
   exploreExploitSlider: {fileID: 1264500385}
