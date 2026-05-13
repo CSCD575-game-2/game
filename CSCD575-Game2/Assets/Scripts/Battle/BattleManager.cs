@@ -13,11 +13,13 @@ public class BattleManager : MonoBehaviour
 
     [Header("Prefabs")]
     [SerializeField] private SpaceshipAgent fighterPrefab;
+    [SerializeField] private SpaceshipAgent enemyFighterPrefab;
 
     [Header("Spawn Settings")]
     [SerializeField] private Transform playerSpawnPoint;
     [SerializeField] private float spacing = 1.2f;
     [SerializeField] private int startingFighters = 5;
+    [SerializeField] private int startingEnemyFighters = 5;
 
     [SerializeField] private GameObject playerMothershipPrefab;
     [SerializeField] private GameObject enemyMothershipPrefab;
@@ -25,11 +27,16 @@ public class BattleManager : MonoBehaviour
     [Header("Commander Dials")]
     [SerializeField] private Slider exploreExploitSlider;
 
+    [SerializeField] private float enemyDeployInterval = 5f;
+
+    private float enemyDeployTimer;
+
     private BattlePhase phase = BattlePhase.Deployment;
 
     private void Start()
     {
         CreateStartingFleet();
+        CreateEnemyFleet();
 
         deployFighterButton.interactable = false;
         endBattleButton.interactable = false;
@@ -49,6 +56,17 @@ public class BattleManager : MonoBehaviour
         {
             FinishEpisode();
         }
+        if (phase == BattlePhase.ActiveBattle)
+        {
+            enemyDeployTimer += Time.deltaTime;
+
+            if (enemyDeployTimer >= enemyDeployInterval)
+            {
+                enemyDeployTimer = 0f;
+
+                DeployEnemyFighter();
+            }
+        }
     }
 
     private void CreateStartingFleet()
@@ -64,6 +82,28 @@ public class BattleManager : MonoBehaviour
             ship.role = ShipRole.Fighter;
             ship.status = ShipStatus.Docked;
             ship.directive = ShipDirective.ReturnHome;
+
+            ship.gameObject.SetActive(false);
+
+            battleEnvironment.RegisterShip(ship);
+        }
+    }
+
+    private void CreateEnemyFleet()
+    {
+        for (int i = 0; i < startingEnemyFighters; i++)
+        {
+            SpaceshipAgent ship = Instantiate(
+                enemyFighterPrefab,
+                battleEnvironment.GridToWorld(
+                    battleEnvironment.enemyMothershipPosition
+                ),
+                Quaternion.identity
+            );
+
+            ship.role = ShipRole.Fighter;
+            ship.team = ShipTeam.Enemy;
+            ship.status = ShipStatus.Docked;
 
             ship.gameObject.SetActive(false);
 
@@ -100,6 +140,10 @@ public class BattleManager : MonoBehaviour
     {
         foreach (SpaceshipAgent ship in battleEnvironment.allShips)
         {
+            // Only update player ships
+            if (ship.team != ShipTeam.Player)
+                continue;
+
             if (ship.Policy is TDPolicy tdPolicy)
             {
                 tdPolicy.Epsilon = value;
@@ -137,7 +181,8 @@ public class BattleManager : MonoBehaviour
         deployFighterButton.interactable = true;
 
         Debug.Log("Episode started: goal is enemy mothership");
-        Debug.Log($"CurrentGoal: {battleEnvironment.CurrentGoal}");
+        Debug.Log($"CurrentPlayerGoal: {battleEnvironment.CurrentPlayerGoal}");
+        Debug.Log($"CurrentEnemyGoal: {battleEnvironment.CurrentEnemyGoal}");
     }
 
     public void EndEpisode()
@@ -194,5 +239,33 @@ public class BattleManager : MonoBehaviour
         );
 
         Debug.Log("Docked fighter deployed");
+    }
+
+    private void DeployEnemyFighter()
+    {
+        SpaceshipAgent ship =
+            battleEnvironment.GetDockedEnemyFighter();
+
+        if (ship == null)
+            return;
+
+        TDPolicy enemyPolicy = new TDPolicy(
+            alpha: 0.2f,
+            gamma: 0.9f,
+            epsilon: 0.1f
+        );
+
+        ship.gameObject.SetActive(true);
+
+        ship.status = ShipStatus.Active;
+        ship.directive = ShipDirective.Attack;
+
+        ship.Initialize(
+            battleEnvironment,
+            enemyPolicy,
+            battleEnvironment.enemyMothershipPosition
+        );
+
+        Debug.Log("Enemy fighter deployed");
     }
 }

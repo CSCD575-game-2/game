@@ -10,6 +10,8 @@ public class SpaceshipAgent : MonoBehaviour
     public ShipRole role;
     public ShipStatus status;
 
+    public ShipTeam team;
+
     [SerializeField] private int maxSteps = 100;
 
     public GridPosition currentState;
@@ -67,7 +69,7 @@ public class SpaceshipAgent : MonoBehaviour
             steps++;
             
             if (status == ShipStatus.ReturningHome &&
-                env.IsAtPlayerMothership(currentState))
+                env.IsAtHomeMothership(this))
             {
                 env.DockShip(this);
                 gameObject.SetActive(false); 
