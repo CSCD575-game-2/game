@@ -456,7 +456,7 @@ GameObject:
   - component: {fileID: 122564221}
   - component: {fileID: 122564222}
   m_Layer: 5
-  m_Name: ConservativeAdaptive
+  m_Name: FormationSpreadout
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1567,6 +1567,7 @@ MonoBehaviour:
     x: 0
     y: 0
     z: 0
+  aggression: 1
 --- !u!4 &415944130
 Transform:
   m_ObjectHideFlags: 0
@@ -5899,6 +5900,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3429156875691226433, guid: ca607127f9c16430a986cfff416d2664, type: 3}
+      propertyPath: targetCamera
+      value: 
+      objectReference: {fileID: 330585545}
     - target: {fileID: 7314138958538809374, guid: ca607127f9c16430a986cfff416d2664, type: 3}
       propertyPath: m_LocalPosition.x
       value: 915
@@ -6824,11 +6829,13 @@ MonoBehaviour:
   enemyFighterPrefab: {fileID: 1539822525}
   playerSpawnPoint: {fileID: 3102909751507431731}
   spacing: 1.2
-  startingFighters: 3
-  startingEnemyFighters: 3
+  startingFighters: 5
+  startingEnemyFighters: 5
+  battleCamera: {fileID: 330585545}
   playerMothershipPrefab: {fileID: 3102909751507431730}
   enemyMothershipPrefab: {fileID: 645630378}
   exploreExploitSlider: {fileID: 1264500385}
+  aggressionSlider: {fileID: 768497385}
   enemyDeployInterval: 5
 --- !u!4 &1670555059
 Transform:
@@ -8880,6 +8887,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2776317016804905503, guid: 5ade57234b985438684ca66e556c8707, type: 3}
+      propertyPath: targetCamera
+      value: 
+      objectReference: {fileID: 330585545}
     - target: {fileID: 4934860741690884272, guid: 5ade57234b985438684ca66e556c8707, type: 3}
       propertyPath: m_LocalPosition.x
       value: 692.89014

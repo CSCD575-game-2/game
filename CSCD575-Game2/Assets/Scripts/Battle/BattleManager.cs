@@ -20,12 +20,16 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private float spacing = 1.2f;
     [SerializeField] private int startingFighters = 5;
     [SerializeField] private int startingEnemyFighters = 5;
+    [SerializeField] private Camera battleCamera;
+    private Transform playerMothership;
+    private Transform enemyMothership;
 
     [SerializeField] private GameObject playerMothershipPrefab;
     [SerializeField] private GameObject enemyMothershipPrefab;
 
     [Header("Commander Dials")]
     [SerializeField] private Slider exploreExploitSlider;
+    [SerializeField] private Slider aggressionSlider;
 
     [SerializeField] private float enemyDeployInterval = 5f;
 
@@ -47,6 +51,9 @@ public class BattleManager : MonoBehaviour
         endBattleButton.onClick.AddListener(EndEpisode);
         deployFighterButton.onClick.AddListener(DeployFighter);
 
+        aggressionSlider.onValueChanged.AddListener(UpdateAggression);
+        battleEnvironment.SetAggression(aggressionSlider.value);
+
         SpawnMotherships();
     }
 
@@ -67,6 +74,35 @@ public class BattleManager : MonoBehaviour
                 DeployEnemyFighter();
             }
         }
+    }
+
+    private void InitializeBattleCamera()
+    {
+        if (battleCamera == null ||
+            playerMothership == null ||
+            enemyMothership == null)
+        {
+            return;
+        }
+
+        Vector3 direction =
+            (enemyMothership.position - playerMothership.position).normalized;
+
+        Vector3 cameraPosition =
+            playerMothership.position
+            - direction * 8f
+            + Vector3.up * 100f;
+
+        battleCamera.transform.position = cameraPosition;
+
+        Vector3 lookTarget =
+            Vector3.Lerp(
+                playerMothership.position,
+                enemyMothership.position,
+                0.5f
+            );
+
+        battleCamera.transform.LookAt(lookTarget);
     }
 
     private void CreateStartingFleet()
@@ -154,7 +190,7 @@ public class BattleManager : MonoBehaviour
 
     private void SpawnMotherships()
     {
-        Instantiate(
+        GameObject playerObj = Instantiate(
             playerMothershipPrefab,
             battleEnvironment.GridToWorld(
                 battleEnvironment.playerMothershipPosition
@@ -162,35 +198,39 @@ public class BattleManager : MonoBehaviour
             Quaternion.identity
         );
 
-        Instantiate(
+        GameObject enemyObj = Instantiate(
             enemyMothershipPrefab,
             battleEnvironment.GridToWorld(
                 battleEnvironment.enemyMothershipPosition
             ),
             Quaternion.identity
         );
+
+        playerMothership = playerObj.transform;
+        enemyMothership = enemyObj.transform;
+        InitializeBattleCamera();
     }
 
     public void StartEpisode()
     {
         phase = BattlePhase.ActiveBattle;
 
-        battleEnvironment.SetAttackGoal();
+        //battleEnvironment.SetAttackGoal();
 
         startButton.interactable = false;
         endBattleButton.interactable = true;
         deployFighterButton.interactable = true;
 
         Debug.Log("Episode started: goal is enemy mothership");
-        Debug.Log($"CurrentPlayerGoal: {battleEnvironment.CurrentPlayerGoal}");
-        Debug.Log($"CurrentEnemyGoal: {battleEnvironment.CurrentEnemyGoal}");
+        //Debug.Log($"CurrentPlayerGoal: {battleEnvironment.CurrentPlayerGoal}");
+        //Debug.Log($"CurrentEnemyGoal: {battleEnvironment.CurrentEnemyGoal}");
     }
 
     public void EndEpisode()
     {
         phase = BattlePhase.Recall;
 
-        battleEnvironment.SetReturnHomeGoal();
+        //battleEnvironment.SetReturnHomeGoal();
 
         deployFighterButton.interactable = false;
         endBattleButton.interactable = false;
@@ -240,6 +280,11 @@ public class BattleManager : MonoBehaviour
         );
 
         Debug.Log("Docked fighter deployed");
+    }
+
+    private void UpdateAggression(float value)
+    {
+        battleEnvironment.SetAggression(value);
     }
 
     private void DeployEnemyFighter()
