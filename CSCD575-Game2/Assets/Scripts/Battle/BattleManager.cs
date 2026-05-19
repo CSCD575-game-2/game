@@ -21,8 +21,12 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private int startingFighters = 5;
     [SerializeField] private int startingEnemyFighters = 5;
     [SerializeField] private Camera battleCamera;
+    [SerializeField] private float enemyDeployInterval = 5f;
     private Transform playerMothership;
     private Transform enemyMothership;
+
+    [SerializeField] private float enemyStartingAggression = 0.1f;
+    [SerializeField] private float enemyAggressionIncreaseRate = 0.02f;
 
     [SerializeField] private GameObject playerMothershipPrefab;
     [SerializeField] private GameObject enemyMothershipPrefab;
@@ -30,8 +34,9 @@ public class BattleManager : MonoBehaviour
     [Header("Commander Dials")]
     [SerializeField] private Slider exploreExploitSlider;
     [SerializeField] private Slider aggressionSlider;
+    [SerializeField] private Slider strategicSlider;
+    [SerializeField] private Slider adaptiveSlider;
 
-    [SerializeField] private float enemyDeployInterval = 5f;
 
     private float enemyDeployTimer;
 
@@ -45,14 +50,16 @@ public class BattleManager : MonoBehaviour
         deployFighterButton.interactable = false;
         endBattleButton.interactable = false;
 
-        exploreExploitSlider.onValueChanged.AddListener(UpdateFleetEpsilon);
-
         startButton.onClick.AddListener(StartEpisode);
         endBattleButton.onClick.AddListener(EndEpisode);
         deployFighterButton.onClick.AddListener(DeployFighter);
 
         aggressionSlider.onValueChanged.AddListener(UpdateAggression);
-        battleEnvironment.SetAggression(aggressionSlider.value);
+        exploreExploitSlider.onValueChanged.AddListener(UpdateFleetEpsilon);
+        strategicSlider.onValueChanged.AddListener(UpdateFleetGamma);
+        adaptiveSlider.onValueChanged.AddListener(UpdateFleetAlpha);
+
+        battleEnvironment.SetPlayerAggression(aggressionSlider.value);
 
         SpawnMotherships();
     }
@@ -65,6 +72,12 @@ public class BattleManager : MonoBehaviour
         }
         if (phase == BattlePhase.ActiveBattle)
         {
+            float nextEnemyAggression =
+                battleEnvironment.enemyAggression +
+                enemyAggressionIncreaseRate * Time.deltaTime;
+
+            battleEnvironment.SetEnemyAggression(nextEnemyAggression);
+
             enemyDeployTimer += Time.deltaTime;
 
             if (enemyDeployTimer >= enemyDeployInterval)
@@ -72,6 +85,7 @@ public class BattleManager : MonoBehaviour
                 enemyDeployTimer = 0f;
 
                 DeployEnemyFighter();
+                Debug.Log("Enemy aggression: " + battleEnvironment.enemyAggression);
             }
         }
     }
@@ -90,7 +104,7 @@ public class BattleManager : MonoBehaviour
 
         Vector3 cameraPosition =
             playerMothership.position
-            - direction * 8f
+            - direction * 20f
             + Vector3.up * 100f;
 
         battleCamera.transform.position = cameraPosition;
@@ -183,7 +197,37 @@ public class BattleManager : MonoBehaviour
 
             if (ship.Policy is TDPolicy tdPolicy)
             {
-                tdPolicy.Epsilon = value;
+                tdPolicy.Epsilon = -value;
+            }
+        }
+    }
+
+    private void UpdateFleetGamma(float value)
+    {
+        foreach (SpaceshipAgent ship in battleEnvironment.allShips)
+        {
+            // Only update player ships
+            if (ship.team != ShipTeam.Player)
+                continue;
+
+            if (ship.Policy is TDPolicy tdPolicy)
+            {
+                tdPolicy.Gamma = value;
+            }
+        }
+    }
+
+    private void UpdateFleetAlpha(float value)
+    {
+        foreach (SpaceshipAgent ship in battleEnvironment.allShips)
+        {
+            // Only update player ships
+            if (ship.team != ShipTeam.Player)
+                continue;
+
+            if (ship.Policy is TDPolicy tdPolicy)
+            {
+                tdPolicy.Alpha = value;
             }
         }
     }
@@ -220,6 +264,8 @@ public class BattleManager : MonoBehaviour
         startButton.interactable = false;
         endBattleButton.interactable = true;
         deployFighterButton.interactable = true;
+
+        battleEnvironment.SetEnemyAggression(enemyStartingAggression);
 
         Debug.Log("Episode started: goal is enemy mothership");
         //Debug.Log($"CurrentPlayerGoal: {battleEnvironment.CurrentPlayerGoal}");
@@ -262,8 +308,8 @@ public class BattleManager : MonoBehaviour
         }
 
         TDPolicy fighterPolicy = new TDPolicy(
-            alpha: 0.2f,
-            gamma: 0.9f,
+            alpha: adaptiveSlider.value,
+            gamma: strategicSlider.value,
             epsilon: exploreExploitSlider.value
         );
 
@@ -284,7 +330,7 @@ public class BattleManager : MonoBehaviour
 
     private void UpdateAggression(float value)
     {
-        battleEnvironment.SetAggression(value);
+        battleEnvironment.SetPlayerAggression(value); 
     }
 
     private void DeployEnemyFighter()

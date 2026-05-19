@@ -16,16 +16,18 @@ public class TDPolicy : IRLPolicy
         "Back"
     };
 
-    private readonly float alpha;
-    private readonly float gamma;
+    //private readonly float alpha;
+    //private readonly float gamma;
 
     public float Epsilon { get; set; }
+    public float Alpha { get; set; }
+    public float Gamma { get; set; }
 
     public TDPolicy(float alpha = 0.2f, float gamma = 0.9f, float epsilon = 0.2f)
     {
-        this.alpha = alpha;
-        this.gamma = gamma;
         Epsilon = epsilon;
+        Alpha = alpha;
+        Gamma = gamma;
     }
 
     public string ChooseAction(SpaceshipAgent ship, BattleEnvironment env)
@@ -89,7 +91,7 @@ public class TDPolicy : IRLPolicy
             bestNextQ = Mathf.Max(bestNextQ, GetQ(nextState, nextAction));
         }
 
-        float newQ = oldQ + alpha * (reward + gamma * bestNextQ - oldQ);
+        float newQ = oldQ + Alpha * (reward + Gamma * bestNextQ - oldQ);
 
         qValues[(state, action)] = newQ;
     }
