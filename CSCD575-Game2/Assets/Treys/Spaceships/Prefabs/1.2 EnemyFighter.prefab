@@ -515,14 +515,14 @@ MonoBehaviour:
   role: 0
   status: 0
   team: 0
-  maxSteps: 100
+  maxSteps: 200
   currentState:
     x: 0
     y: 0
     z: 0
   maxHealth: 100
-  moveSpeed: 3
-  stepDelay: 0.5
+  moveDuration: 0.5
+  stepDelay: 0.01
   spacing: 1.2
   rotateSpeed: 8
   rotationOffsetEuler: {x: 0, y: 0, z: 0}

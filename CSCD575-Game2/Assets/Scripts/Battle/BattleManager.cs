@@ -126,7 +126,7 @@ public class BattleManager : MonoBehaviour
 
         Vector3 cameraPosition =
             playerMothership.position
-            - direction * 20f
+            - direction * 120f
             + Vector3.up * 100f;
 
         battleCamera.transform.position = cameraPosition;

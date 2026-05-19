@@ -5876,11 +5876,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e05e6d7e931945efbe34c0e756c57a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  sizeX: 3
-  sizeY: 1
-  sizeZ: 3
+  sizeX: 4
+  sizeY: 2
+  sizeZ: 4
   tileSpacing: 100
   tilePrefab: {fileID: 4994768076444227659, guid: 6057de322d60a45daaf60997bc20696f, type: 3}
+  instantiateTiles: 0
   battleEnvironment: {fileID: 415944129}
 --- !u!4 &1517941608
 Transform:
@@ -6837,9 +6838,9 @@ MonoBehaviour:
   startingFighters: 10
   startingEnemyFighters: 10
   battleCamera: {fileID: 330585545}
-  enemyDeployInterval: 5
-  enemyStartingAggression: 0
-  enemyAggressionIncreaseRate: 0.001
+  enemyDeployInterval: 2
+  enemyStartingAggression: 0.2
+  enemyAggressionIncreaseRate: 0.05
   playerMothershipPrefab: {fileID: 3102909751507431730}
   enemyMothershipPrefab: {fileID: 645630378}
   exploreExploitSlider: {fileID: 1264500385}
@@ -9052,7 +9053,7 @@ SceneRoots:
   - {fileID: 415944130}
   - {fileID: 1670555059}
   - {fileID: 2964645160267510232}
+  - {fileID: 1539822524}
   - {fileID: 3102909751507431729}
   - {fileID: 645630377}
-  - {fileID: 1539822524}
   - {fileID: 1659734883}

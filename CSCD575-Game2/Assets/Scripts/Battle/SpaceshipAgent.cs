@@ -27,7 +27,8 @@ public class SpaceshipAgent : MonoBehaviour
 
     public float HealthPercent => currentHealth / maxHealth;
 
-    [SerializeField] private float moveSpeed = 3f;
+    [SerializeField] private float moveDuration = 0.25f;
+    //[SerializeField] private float moveSpeed = 3f;
     [SerializeField] private float stepDelay = 0.3f;
     [SerializeField] private float spacing = 1.2f;
 
@@ -113,7 +114,7 @@ public class SpaceshipAgent : MonoBehaviour
             GridPosition nextGridState = env.GetNextState(currentState, action);
             reward = env.GetReward(this, currentState, action, nextGridState);
 
-            yield return MoveTo(env.GridToWorld(nextGridState));
+            yield return MoveTo(env.GridToWorldWithNoise(nextGridState));
 
             currentState = nextGridState;
 
@@ -149,39 +150,58 @@ public class SpaceshipAgent : MonoBehaviour
     IEnumerator MoveTo(Vector3 target)
     {
         Vector3 start = transform.position;
-        Vector3 direction = target - start;
 
-        if (direction.sqrMagnitude > 0.001f)
+        Vector3 mid = (start + target) * 0.5f;
+
+        Vector3 sideways = Vector3.Cross(
+                (target - start).normalized,
+                Vector3.up
+                );
+
+        mid += sideways * Random.Range(-2.5f, 2.5f);
+        mid += Vector3.up * Random.Range(0.1f, 0.4f);
+
+        float t = 0f;
+
+        float duration = moveDuration; 
+
+        while (t < 1.0f)
         {
-            Quaternion targetRotation =
-                Quaternion.LookRotation(direction.normalized, Vector3.up)
-                * Quaternion.Euler(rotationOffsetEuler);
+            t += Time.deltaTime / duration;
 
-            while (Quaternion.Angle(transform.rotation, targetRotation) > 1f)
+            float smoothT =
+                Mathf.SmoothStep(
+                        0f,
+                        1f,
+                        Mathf.SmoothStep(0f, 1f, t)
+                        );
+
+            Vector3 a = Vector3.Lerp(start, mid, smoothT);
+            Vector3 b = Vector3.Lerp(mid, target, smoothT);
+
+            Vector3 pos = Vector3.Lerp(a, b, smoothT);
+
+            Vector3 direction = pos - transform.position;
+
+            if (direction.sqrMagnitude > 0.001f)
             {
+                Quaternion targetRotation =
+                    Quaternion.LookRotation(direction.normalized, Vector3.up)
+                    * Quaternion.Euler(rotationOffsetEuler);
+
                 transform.rotation = Quaternion.Slerp(
                         transform.rotation,
                         targetRotation,
                         rotateSpeed * Time.deltaTime
                         );
-
-                yield return null;
             }
-        }
 
-        float t = 0f;
-
-        while (t < 1f)
-        {
-            t += Time.deltaTime * moveSpeed;
-
-            transform.position = Vector3.Lerp(start, target, t);
+            transform.position = pos;
 
             yield return null;
         }
 
-        transform.position = target;
-    }
+        transform.position = target;}
 
     //Vector3 GridToWorld(GridPosition pos)
     //{
