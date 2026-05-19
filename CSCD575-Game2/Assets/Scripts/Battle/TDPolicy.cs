@@ -13,7 +13,14 @@ public class TDPolicy : IRLPolicy
         "Left",
         "Right",
         "Forward",
-        "Back"
+        "Back",
+        "HoldPosition",
+        "AttackUp",
+        "AttackDown",
+        "AttackLeft",
+        "AttackRight",
+        "AttackForward",
+        "AttackBack"
     };
 
     //private readonly float alpha;

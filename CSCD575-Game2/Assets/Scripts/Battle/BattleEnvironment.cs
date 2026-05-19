@@ -175,6 +175,21 @@ public class BattleEnvironment : MonoBehaviour
         );
     }
 
+    public Vector3 GridToWorldWithNoise(GridPosition pos)
+    {
+        Vector3 center = GridToWorld(pos);
+
+        float noiseRadius = tileSpacing * 0.35f;
+
+        Vector3 noise = new Vector3(
+                Random.Range(-noiseRadius, noiseRadius),
+                Random.Range(-noiseRadius * 0.2f, noiseRadius * 0.2f),
+                Random.Range(-noiseRadius, noiseRadius)
+                );
+
+        return center + noise;
+    }
+
     public GridPosition GetNextState(GridPosition state, string action)
     {
         GridPosition next = state;
