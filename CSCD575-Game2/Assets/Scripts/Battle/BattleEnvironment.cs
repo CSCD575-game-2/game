@@ -19,7 +19,10 @@ public class BattleEnvironment : MonoBehaviour
     //public GridPosition CurrentEnemyGoal { get; private set; }
     //
     [Range(0f, 1f)]
-    public float aggression = 1f;
+    public float playerAggression = 0.5f;
+
+    [Range(0f, 1f)]
+    public float enemyAggression = 0.1f;
 
     public void Initialize(int sizeX, int sizeY, int sizeZ, float tileSpacing)
     {
@@ -36,10 +39,23 @@ public class BattleEnvironment : MonoBehaviour
         );
     }
 
-    public void SetAggression(float value)
+    public void SetPlayerAggression(float value)
     {
-        aggression = Mathf.Clamp01(value);
+        playerAggression = Mathf.Clamp01(value);
     }
+
+    public void SetEnemyAggression(float value)
+    {
+        enemyAggression = Mathf.Clamp01(value);
+    }
+
+    public float GetAggressionForShip(SpaceshipAgent ship)
+    {
+        return ship.team == ShipTeam.Player
+            ? playerAggression
+            : enemyAggression;
+    }
+
     private Vector3 GetCommanderGoalWorldPosition(SpaceshipAgent ship)
     {
         Vector3 home;
@@ -63,7 +79,9 @@ public class BattleEnvironment : MonoBehaviour
                 : GridToWorld(enemyMothershipPosition);
         }
 
-        return Vector3.Lerp(home, enemy, aggression);
+       float aggression = GetAggressionForShip(ship);
+       return Vector3.Lerp(home, enemy, aggression); 
+
     }
 
     public void RegisterShip(SpaceshipAgent ship)

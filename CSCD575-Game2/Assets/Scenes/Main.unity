@@ -1567,7 +1567,8 @@ MonoBehaviour:
     x: 0
     y: 0
     z: 0
-  aggression: 1
+  playerAggression: 0.5
+  enemyAggression: 0.1
 --- !u!4 &415944130
 Transform:
   m_ObjectHideFlags: 0
@@ -6828,15 +6829,19 @@ MonoBehaviour:
   fighterPrefab: {fileID: 2964645160267510233}
   enemyFighterPrefab: {fileID: 1539822525}
   playerSpawnPoint: {fileID: 3102909751507431731}
-  spacing: 1.2
+  spacing: 20
   startingFighters: 5
   startingEnemyFighters: 5
   battleCamera: {fileID: 330585545}
+  enemyDeployInterval: 5
+  enemyStartingAggression: 0
+  enemyAggressionIncreaseRate: 0.001
   playerMothershipPrefab: {fileID: 3102909751507431730}
   enemyMothershipPrefab: {fileID: 645630378}
   exploreExploitSlider: {fileID: 1264500385}
   aggressionSlider: {fileID: 768497385}
-  enemyDeployInterval: 5
+  strategicSlider: {fileID: 1687748888}
+  adaptiveSlider: {fileID: 1993491291}
 --- !u!4 &1670555059
 Transform:
   m_ObjectHideFlags: 0
