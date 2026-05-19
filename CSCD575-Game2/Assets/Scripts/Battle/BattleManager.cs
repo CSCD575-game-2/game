@@ -88,6 +88,28 @@ public class BattleManager : MonoBehaviour
                 Debug.Log("Enemy aggression: " + battleEnvironment.enemyAggression);
             }
         }
+        if (battleEnvironment.playerMothership != null &&
+                battleEnvironment.playerMothership.IsDestroyed)
+        {
+            GameOver(false);
+        }
+
+        if (battleEnvironment.enemyMothership != null &&
+                battleEnvironment.enemyMothership.IsDestroyed)
+        {
+            GameOver(true);
+        }
+    }
+
+    private void GameOver(bool playerWon)
+    {
+        phase = BattlePhase.Finished;
+
+        startButton.interactable = true;
+        deployFighterButton.interactable = false;
+        endBattleButton.interactable = false;
+
+        Debug.Log(playerWon ? "Victory!" : "Defeat!");
     }
 
     private void InitializeBattleCamera()
@@ -249,6 +271,14 @@ public class BattleManager : MonoBehaviour
             ),
             Quaternion.identity
         );
+
+        Mothership playerMs = playerObj.GetComponent<Mothership>();
+        playerMs.team = ShipTeam.Player;
+        battleEnvironment.RegisterMothership(playerMs);
+
+        Mothership enemyMs = enemyObj.GetComponent<Mothership>();
+        enemyMs.team = ShipTeam.Enemy;
+        battleEnvironment.RegisterMothership(enemyMs);
 
         playerMothership = playerObj.transform;
         enemyMothership = enemyObj.transform;

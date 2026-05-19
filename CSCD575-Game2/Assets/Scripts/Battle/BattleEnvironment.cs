@@ -15,6 +15,9 @@ public class BattleEnvironment : MonoBehaviour
     public GridPosition playerMothershipPosition;
     public GridPosition enemyMothershipPosition;
 
+    public Mothership playerMothership { get; private set; }
+    public Mothership enemyMothership { get; private set; }
+
     //public GridPosition CurrentPlayerGoal { get; private set; }
     //public GridPosition CurrentEnemyGoal { get; private set; }
     //
@@ -23,6 +26,7 @@ public class BattleEnvironment : MonoBehaviour
 
     [Range(0f, 1f)]
     public float enemyAggression = 0.1f;
+
 
     public void Initialize(int sizeX, int sizeY, int sizeZ, float tileSpacing)
     {
@@ -82,6 +86,14 @@ public class BattleEnvironment : MonoBehaviour
        float aggression = GetAggressionForShip(ship);
        return Vector3.Lerp(home, enemy, aggression); 
 
+    }
+
+    public void RegisterMothership(Mothership mothership)
+    {
+        if (mothership.team == ShipTeam.Player)
+            playerMothership = mothership;
+        else
+            enemyMothership = mothership;
     }
 
     public void RegisterShip(SpaceshipAgent ship)
@@ -320,20 +332,59 @@ public class BattleEnvironment : MonoBehaviour
             return -2f;
 
         SpaceshipAgent target = GetShipAtPosition(targetPos, attacker.team);
+        Mothership mothership = GetEnemyMothershipAtPosition(attacker, targetPos);
+        Debug.Log($"Resolving attack: Attacker: {attacker.name}, Action: {action}, TargetPos: {targetPos}, Target: {(target != null ? target.name : "None")} Mothership: {(mothership != null ? mothership.name : "None")}");
 
         attacker.PlayAttackEffect(GridToWorld(targetPos));
 
-        Debug.Log($"Attacker: {attacker.name}, Action: {action}, TargetPos: {targetPos}, Target: {(target != null ? target.name : "None")}");
+        Debug.Log($"Attacker: {attacker.name}, Action: {action}, TargetPos: {targetPos}, Target: {(target != null ? target.name : "None")} Mothership: {(mothership != null ? mothership.name : "None")}");
 
-        if (target == null)
+        if (target == null && mothership == null)
             return -0.5f; // missed shot
 
-        target.TakeDamage(25f);
+        if (target != null)
+        {
+            target.TakeDamage(25f);
 
-        if (target.status == ShipStatus.Destroyed)
-            return 10f;
+            if (target.status == ShipStatus.Destroyed && target.role == ShipRole.Fighter)
+                return 10f;
+            if (target.status == ShipStatus.Destroyed && target.role == ShipRole.Mothership)
+                return 50f;
+
+            return 5f;
+
+        } 
+        else if (mothership != null)
+        {
+            mothership.TakeDamage(25f);
+
+            if (mothership.status == ShipStatus.Destroyed)
+                return 50f;
+
+            return 50f;
+        }
 
         return 3f;
+    }
+
+    private Mothership GetEnemyMothershipAtPosition(
+    SpaceshipAgent attacker,
+    GridPosition pos)
+    {
+        Debug.Log("checking for mothership at position: " + pos + " player mothership position: " + playerMothershipPosition + " enemy mothership position: " + enemyMothershipPosition);
+        if (attacker.team == ShipTeam.Player &&
+                pos.Equals(enemyMothershipPosition))
+        {
+            return enemyMothership;
+        }
+
+        if (attacker.team == ShipTeam.Enemy &&
+                pos.Equals(playerMothershipPosition))
+        {
+            return playerMothership;
+        }
+
+        return null;
     }
 
     private SpaceshipAgent GetShipAtPosition(GridPosition pos, ShipTeam attackerTeam)
@@ -349,6 +400,7 @@ public class BattleEnvironment : MonoBehaviour
             if (ship.CurrentState.Equals(pos))
                 return ship;
         }
+
 
         return null;
     }
@@ -382,6 +434,20 @@ public class BattleEnvironment : MonoBehaviour
 
             if (other.CurrentState.Equals(pos))
                 return true;
+        }
+
+        if (ship.team == ShipTeam.Player &&
+                pos.Equals(enemyMothershipPosition) &&
+                enemyMothership.status != ShipStatus.Destroyed)
+        {
+            return true;
+        }
+
+        if (ship.team == ShipTeam.Enemy &&
+                pos.Equals(playerMothershipPosition) &&
+                playerMothership.status != ShipStatus.Destroyed)
+        {
+            return true;
         }
 
         return false;
