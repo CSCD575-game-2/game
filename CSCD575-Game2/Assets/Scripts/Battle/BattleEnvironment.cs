@@ -15,8 +15,11 @@ public class BattleEnvironment : MonoBehaviour
     public GridPosition playerMothershipPosition;
     public GridPosition enemyMothershipPosition;
 
-    public GridPosition CurrentPlayerGoal { get; private set; }
-    public GridPosition CurrentEnemyGoal { get; private set; }
+    //public GridPosition CurrentPlayerGoal { get; private set; }
+    //public GridPosition CurrentEnemyGoal { get; private set; }
+    //
+    [Range(0f, 1f)]
+    public float aggression = 1f;
 
     public void Initialize(int sizeX, int sizeY, int sizeZ, float tileSpacing)
     {
@@ -31,6 +34,36 @@ public class BattleEnvironment : MonoBehaviour
             sizeY - 1,
             sizeZ - 1
         );
+    }
+
+    public void SetAggression(float value)
+    {
+        aggression = Mathf.Clamp01(value);
+    }
+    private Vector3 GetCommanderGoalWorldPosition(SpaceshipAgent ship)
+    {
+        Vector3 home;
+        Vector3 enemy;
+
+        if (ship.team == ShipTeam.Player)
+        {
+            home = GridToWorld(playerMothershipPosition);
+            enemy = GridToWorld(enemyMothershipPosition);
+        }
+        else
+        {
+            home = GridToWorld(enemyMothershipPosition);
+            enemy = GridToWorld(playerMothershipPosition);
+        }
+
+        if (ship.status == ShipStatus.ReturningHome)
+        {
+            return ship.team == ShipTeam.Player
+                ? GridToWorld(playerMothershipPosition)
+                : GridToWorld(enemyMothershipPosition);
+        }
+
+        return Vector3.Lerp(home, enemy, aggression);
     }
 
     public void RegisterShip(SpaceshipAgent ship)
@@ -141,6 +174,10 @@ public class BattleEnvironment : MonoBehaviour
             case "Back":
                 next = new GridPosition(state.x, state.y, state.z - 1);
                 break;
+
+            case "HoldPosition":
+                next = state;
+                break;
         }
 
         //next.x = Mathf.Clamp(next.x, 0, sizeX - 1);
@@ -174,33 +211,24 @@ public class BattleEnvironment : MonoBehaviour
     {
         float reward = -0.1f;
         
-        GridPosition currentGoal;
-        if (ship.team == ShipTeam.Player)
-        {
-            currentGoal = CurrentPlayerGoal;
-        }
-        else
-        {
-            currentGoal = CurrentEnemyGoal;
-        }
+        Vector3 goalWorld = GetCommanderGoalWorldPosition(ship);
 
-        int oldDistance = ManhattanDistance(state, currentGoal);
-        int newDistance = ManhattanDistance(nextState, currentGoal);
+        float oldDistance = Vector3.Distance(
+                GridToWorld(state),
+                goalWorld
+                );
 
-        if (nextState.Equals(state))
-        {
-            reward -= 2f;
-            return reward;
-        }
+        float newDistance = Vector3.Distance(
+                GridToWorld(nextState),
+                goalWorld
+                );
 
         if (newDistance < oldDistance)
             reward += 1f;
-
-        if (newDistance > oldDistance)
+        else if (newDistance > oldDistance)
             reward -= 1f;
-
-        if (nextState.Equals(currentGoal))
-            reward += 20f;
+        else
+            reward -= 0.2f;
 
         //if (ship.role == ShipRole.Fighter)
         //{
@@ -223,30 +251,121 @@ public class BattleEnvironment : MonoBehaviour
              + Mathf.Abs(a.z - b.z);
     }
 
-    public void SetAttackGoal()
-    {
-        CurrentEnemyGoal = playerMothershipPosition;
-        CurrentPlayerGoal = enemyMothershipPosition;
-    }
+    //public void SetAttackGoal()
+    //{
+        //CurrentEnemyGoal = playerMothershipPosition;
+        //CurrentPlayerGoal = enemyMothershipPosition;
+    //}
 
-    public void SetReturnHomeGoal()
-    {
-        CurrentEnemyGoal = enemyMothershipPosition;
-        CurrentPlayerGoal = playerMothershipPosition;
-    }
+    //public void SetReturnHomeGoal()
+    //{
+        //CurrentEnemyGoal = enemyMothershipPosition;
+        //CurrentPlayerGoal = playerMothershipPosition;
+    //}
 
     public bool IsAtHomeMothership(SpaceshipAgent ship)
     {
         if (ship.team == ShipTeam.Player)
         {
             return ship.CurrentState.Equals(
-                playerMothershipPosition
-            );
+                    playerMothershipPosition
+                    );
         }
 
         return ship.CurrentState.Equals(
-            enemyMothershipPosition
-        );
+                enemyMothershipPosition
+                );
     }
 
+    public bool IsAttackAction(string action)
+    {
+        return action.StartsWith("Attack");
+    }
+
+    public GridPosition GetAttackTarget(GridPosition state, string action)
+    {
+        return action switch
+        {
+            "AttackLeft" => new GridPosition(state.x - 1, state.y, state.z),
+            "AttackRight" => new GridPosition(state.x + 1, state.y, state.z),
+            "AttackForward" => new GridPosition(state.x, state.y, state.z + 1),
+            "AttackBack" => new GridPosition(state.x, state.y, state.z - 1),
+            _ => state
+        };
+    }
+
+    public float ResolveAttack(SpaceshipAgent attacker, string action)
+    {
+        GridPosition targetPos = GetAttackTarget(attacker.CurrentState, action);
+
+        if (!IsWithinBounds(targetPos))
+            return -2f;
+
+        SpaceshipAgent target = GetShipAtPosition(targetPos, attacker.team);
+
+        attacker.PlayAttackEffect(GridToWorld(targetPos));
+
+        Debug.Log($"Attacker: {attacker.name}, Action: {action}, TargetPos: {targetPos}, Target: {(target != null ? target.name : "None")}");
+
+        if (target == null)
+            return -0.5f; // missed shot
+
+        target.TakeDamage(25f);
+
+        if (target.status == ShipStatus.Destroyed)
+            return 10f;
+
+        return 3f;
+    }
+
+    private SpaceshipAgent GetShipAtPosition(GridPosition pos, ShipTeam attackerTeam)
+    {
+        foreach (SpaceshipAgent ship in allShips)
+        {
+            if (ship.status == ShipStatus.Destroyed)
+                continue;
+
+            if (ship.team == attackerTeam)
+                continue;
+
+            if (ship.CurrentState.Equals(pos))
+                return ship;
+        }
+
+        return null;
+    }
+
+    public ShipState GetShipState(SpaceshipAgent ship)
+    {
+        GridPosition pos = ship.CurrentState;
+
+        return new ShipState(
+                pos,
+                HasEnemyAt(ship, new GridPosition(pos.x - 1, pos.y, pos.z)),
+                HasEnemyAt(ship, new GridPosition(pos.x + 1, pos.y, pos.z)),
+                HasEnemyAt(ship, new GridPosition(pos.x, pos.y, pos.z + 1)),
+                HasEnemyAt(ship, new GridPosition(pos.x, pos.y, pos.z - 1))
+                );
+    }
+
+    public bool HasEnemyAt(SpaceshipAgent ship, GridPosition pos)
+    {
+        foreach (SpaceshipAgent other in allShips)
+        {
+            if (other == ship)
+                continue;
+
+            if (other.status == ShipStatus.Destroyed ||
+                    other.status == ShipStatus.Docked)
+                continue;
+
+            if (other.team == ship.team)
+                continue;
+
+            if (other.CurrentState.Equals(pos))
+                return true;
+        }
+
+        return false;
+    }
 }
