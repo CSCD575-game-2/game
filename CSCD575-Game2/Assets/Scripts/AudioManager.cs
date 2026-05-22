@@ -17,6 +17,8 @@ public class AudioManager : MonoBehaviour
     public AudioClip deployShip;
     public AudioClip battleStart;
     public AudioClip battleEnd;
+    public AudioClip laserShot;
+    public AudioClip explosion;
 
     private bool muted = false;
 
@@ -68,5 +70,16 @@ public class AudioManager : MonoBehaviour
         {
             sfxSource.PlayOneShot(clip);
         }
+    }
+  public void PlayLaserShot()
+    {
+        if (laserShot != null)
+            sfxSource.PlayOneShot(laserShot);
+    }
+
+    public void PlayExplosion()
+    {
+        if (explosion != null)
+            sfxSource.PlayOneShot(explosion);
     }
 }

@@ -78,11 +78,18 @@ public class SpaceshipAgent : MonoBehaviour
         currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
 
-        if (currentHealth <= 0f)
+    if (currentHealth <= 0f)
+    {
+        status = ShipStatus.Destroyed;
+
+        if (AudioManager.Instance != null)
         {
-            status = ShipStatus.Destroyed;
-            gameObject.SetActive(false);
+            AudioManager.Instance.PlayExplosion();
         }
+
+        gameObject.SetActive(false);
+    }
+
     }
 
 
