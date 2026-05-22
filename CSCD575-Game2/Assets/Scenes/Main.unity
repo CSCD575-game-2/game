@@ -6684,8 +6684,10 @@ MonoBehaviour:
   backgroundMusic: {fileID: 8300000, guid: b101f55bf4c69db48a978d845bf9cbb1, type: 3}
   buttonClick: {fileID: 8300000, guid: 8373609ca992684458c0b882cf044d39, type: 3}
   deployShip: {fileID: 8300000, guid: 8373609ca992684458c0b882cf044d39, type: 3}
-  battleStart: {fileID: 0}
-  battleEnd: {fileID: 0}
+  battleStart: {fileID: 8300000, guid: 8373609ca992684458c0b882cf044d39, type: 3}
+  battleEnd: {fileID: 8300000, guid: 8373609ca992684458c0b882cf044d39, type: 3}
+  laserShot: {fileID: 8300000, guid: befd6965db414aa4a81196438af91d8e, type: 3}
+  explosion: {fileID: 8300000, guid: 358944f07ac8a3147b1ed1b30ac0a3a5, type: 3}
 --- !u!4 &1659734883
 Transform:
   m_ObjectHideFlags: 0

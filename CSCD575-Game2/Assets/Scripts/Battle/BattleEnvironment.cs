@@ -351,7 +351,10 @@ public class BattleEnvironment : MonoBehaviour
         Debug.Log($"Resolving attack: Attacker: {attacker.name}, Action: {action}, TargetPos: {targetPos}, Target: {(target != null ? target.name : "None")} Mothership: {(mothership != null ? mothership.name : "None")}");
 
         attacker.PlayAttackEffect(GridToWorld(targetPos));
-
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayLaserShot();
+        }
         Debug.Log($"Attacker: {attacker.name}, Action: {action}, TargetPos: {targetPos}, Target: {(target != null ? target.name : "None")} Mothership: {(mothership != null ? mothership.name : "None")}");
 
         if (target == null && mothership == null)
