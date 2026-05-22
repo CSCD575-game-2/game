@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class TDPolicy : IRLPolicy
 {
-    private readonly Dictionary<(GridPosition, string), float> qValues = new();
+    //private readonly Dictionary<(GridPosition, string), float> qValues = new();
+    private readonly Dictionary<(ShipState, string), float> qValues = new();
 
     private string[] actions =
     {
@@ -12,21 +13,28 @@ public class TDPolicy : IRLPolicy
         "Left",
         "Right",
         "Forward",
-        "Back"
+        "Back",
+        "HoldPosition",
+        "AttackUp",
+        "AttackDown",
+        "AttackLeft",
+        "AttackRight",
+        "AttackForward",
+        "AttackBack"
     };
 
-    private readonly float alpha;
-    private readonly float gamma;
+    //private readonly float alpha;
+    //private readonly float gamma;
 
-    //private readonly float epsilon;
     public float Epsilon { get; set; }
+    public float Alpha { get; set; }
+    public float Gamma { get; set; }
 
     public TDPolicy(float alpha = 0.2f, float gamma = 0.9f, float epsilon = 0.2f)
     {
-        this.alpha = alpha;
-        this.gamma = gamma;
-        //this.epsilon = epsilon;
         Epsilon = epsilon;
+        Alpha = alpha;
+        Gamma = gamma;
     }
 
     public string ChooseAction(SpaceshipAgent ship, BattleEnvironment env)
@@ -39,11 +47,17 @@ public class TDPolicy : IRLPolicy
                 "Left",
                 "Right",
                 "Forward",
-                "Back"
+                "Back",
+                "HoldPosition",
+                "AttackLeft",
+                "AttackRight",
+                "AttackForward",
+                "AttackBack"
             };
         }
 
-        GridPosition state = ship.CurrentState;
+        //GridPosition state = ship.CurrentState;
+        ShipState state = env.GetShipState(ship);
 
         // explore
         if (Random.value < Epsilon)
@@ -69,7 +83,11 @@ public class TDPolicy : IRLPolicy
         return bestAction;
     }
 
-    public void Learn(GridPosition state, string action, float reward, GridPosition nextState)
+    public void Learn(
+            ShipState state,
+            string action,
+            float reward,
+            ShipState nextState)
     {
         float oldQ = GetQ(state, action);
 
@@ -80,20 +98,31 @@ public class TDPolicy : IRLPolicy
             bestNextQ = Mathf.Max(bestNextQ, GetQ(nextState, nextAction));
         }
 
-        float newQ = oldQ + alpha * (reward + gamma * bestNextQ - oldQ);
+        float newQ = oldQ + Alpha * (reward + Gamma * bestNextQ - oldQ);
 
         qValues[(state, action)] = newQ;
     }
 
-    private float GetQ(GridPosition state, string action)
+    private float GetQ(ShipState state, string action)
     {
         var key = (state, action);
 
         if (!qValues.ContainsKey(key))
-        {
             qValues[key] = 0f;
-        }
 
         return qValues[key];
     }
+
+    
+    //private float GetQ(GridPosition state, string action)
+    //{
+        //var key = (state, action);
+
+        //if (!qValues.ContainsKey(key))
+        //{
+            //qValues[key] = 0f;
+        //}
+
+        //return qValues[key];
+    //}
 }

@@ -456,7 +456,7 @@ GameObject:
   - component: {fileID: 122564221}
   - component: {fileID: 122564222}
   m_Layer: 5
-  m_Name: ConservativeAdaptive
+  m_Name: FormationSpreadout
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -479,9 +479,9 @@ RectTransform:
   - {fileID: 1100231753}
   m_Father: {fileID: 1754831633}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 185, y: 0}
   m_SizeDelta: {x: 150, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &122564221
@@ -1567,6 +1567,8 @@ MonoBehaviour:
     x: 0
     y: 0
     z: 0
+  playerAggression: 0.5
+  enemyAggression: 0.1
 --- !u!4 &415944130
 Transform:
   m_ObjectHideFlags: 0
@@ -2210,9 +2212,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1754831633}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 50, y: 0}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &631094852
@@ -2363,6 +2365,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6159357330671018884, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
+      propertyPath: targetCamera
+      value: 
+      objectReference: {fileID: 330585545}
     - target: {fileID: 7416584044414341810, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
       propertyPath: m_Name
       value: F3_Yellow Enemy Mothership
@@ -2774,7 +2780,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.5
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -4309,7 +4315,7 @@ RectTransform:
   m_Father: {fileID: 1812212105}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4595,9 +4601,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1754831633}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 295, y: 0}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1193642194
@@ -5161,7 +5167,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.5
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -5293,7 +5299,7 @@ RectTransform:
   m_Father: {fileID: 1100231753}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -5870,11 +5876,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e05e6d7e931945efbe34c0e756c57a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  sizeX: 5
-  sizeY: 1
-  sizeZ: 5
+  sizeX: 4
+  sizeY: 2
+  sizeZ: 4
   tileSpacing: 100
   tilePrefab: {fileID: 4994768076444227659, guid: 6057de322d60a45daaf60997bc20696f, type: 3}
+  instantiateTiles: 0
   battleEnvironment: {fileID: 415944129}
 --- !u!4 &1517941608
 Transform:
@@ -5899,6 +5906,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3429156875691226433, guid: ca607127f9c16430a986cfff416d2664, type: 3}
+      propertyPath: targetCamera
+      value: 
+      objectReference: {fileID: 330585545}
     - target: {fileID: 7314138958538809374, guid: ca607127f9c16430a986cfff416d2664, type: 3}
       propertyPath: m_LocalPosition.x
       value: 915
@@ -6824,12 +6835,18 @@ MonoBehaviour:
   enemyFighterPrefab: {fileID: 1539822525}
   playerSpawnPoint: {fileID: 3102909751507431731}
   spacing: 1.2
-  startingFighters: 3
-  startingEnemyFighters: 3
+  startingFighters: 10
+  startingEnemyFighters: 10
+  battleCamera: {fileID: 330585545}
+  enemyDeployInterval: 2
+  enemyStartingAggression: 0.2
+  enemyAggressionIncreaseRate: 0.05
   playerMothershipPrefab: {fileID: 3102909751507431730}
   enemyMothershipPrefab: {fileID: 645630378}
   exploreExploitSlider: {fileID: 1264500385}
-  enemyDeployInterval: 5
+  aggressionSlider: {fileID: 768497385}
+  strategicSlider: {fileID: 1687748888}
+  adaptiveSlider: {fileID: 1993491291}
 --- !u!4 &1670555059
 Transform:
   m_ObjectHideFlags: 0
@@ -6932,7 +6949,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.5
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -7186,7 +7203,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1754831633
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7204,10 +7221,10 @@ RectTransform:
   - {fileID: 1193642193}
   m_Father: {fileID: 1433646123}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 196.65001, y: -345.4277}
+  m_SizeDelta: {x: 393.30002, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1754831634
 MonoBehaviour:
@@ -8360,7 +8377,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.5
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -8880,6 +8897,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2776317016804905503, guid: 5ade57234b985438684ca66e556c8707, type: 3}
+      propertyPath: targetCamera
+      value: 
+      objectReference: {fileID: 330585545}
     - target: {fileID: 4934860741690884272, guid: 5ade57234b985438684ca66e556c8707, type: 3}
       propertyPath: m_LocalPosition.x
       value: 692.89014
@@ -8992,6 +9013,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3435358479304392949, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
+      propertyPath: targetCamera
+      value: 
+      objectReference: {fileID: 330585545}
+    - target: {fileID: 7267863022407217148, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
+      propertyPath: targetCamera
+      value: 
+      objectReference: {fileID: 330585545}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -9024,7 +9053,7 @@ SceneRoots:
   - {fileID: 415944130}
   - {fileID: 1670555059}
   - {fileID: 2964645160267510232}
+  - {fileID: 1539822524}
   - {fileID: 3102909751507431729}
   - {fileID: 645630377}
-  - {fileID: 1539822524}
   - {fileID: 1659734883}

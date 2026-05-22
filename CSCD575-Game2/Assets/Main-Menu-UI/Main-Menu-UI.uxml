@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="Screen" style="flex-grow: 1; padding-left: 0%; border-left-color: rgb(245, 245, 245); border-right-color: rgb(245, 245, 245); border-top-color: rgb(245, 245, 245); border-bottom-color: rgb(245, 245, 245); border-top-width: 5px; border-right-width: 5px; border-bottom-width: 5px; border-left-width: 5px;">
+        <ui:VisualElement name="TitleBar" style="flex-grow: 1; align-self: center; width: 100%; height: 30%; padding-left: 30%; padding-right: 30%;">
+            <ui:Label text="SPARTS" name="Game-Title" language-direction="Inherit" style="align-self: center; align-content: flex-end; align-items: stretch; justify-content: center; -unity-text-align: middle-center; padding-top: 5%; width: 100%; height: 80%; font-size: 80%; color: rgb(188, 166, 166); -unity-text-outline-width: 6px; -unity-text-outline-color: rgb(11, 51, 106);"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="Buttons" style="flex-grow: 5; justify-content: center; align-self: center; align-content: center; width: 30%; flex-direction: column; height: 70%; align-items: center; flex-shrink: 5; background-color: rgba(111, 106, 106, 0.35);">
+            <ui:Button text="New Game" name="NewGame" icon-image="" triple-click-selects-line="false" double-click-selects-word="true" style="width: 80%; height: 10%; margin-top: 2%; margin-bottom: 10%; margin-right: 4%; margin-left: 4%; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); font-size: 30%;"/>
+            <ui:Button text="Settings" name="Settings" style="width: 80%; height: 10%; margin-top: 8%; margin-right: 4%; margin-bottom: 10%; margin-left: 4%; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); font-size: 30%;"/>
+            <ui:Button text="Quit&#10;" name="Quit" style="width: 80%; height: 10%; margin-top: 8%; margin-right: 4%; margin-bottom: 2%; margin-left: 4%; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); font-size: 30%;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

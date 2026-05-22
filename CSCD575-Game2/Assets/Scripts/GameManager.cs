@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Prefabs")]
     [SerializeField] private GridTileView tilePrefab;
+    [SerializeField] private bool instantiateTiles = true;
 
     [Header("Battle")]
     [SerializeField] private BattleEnvironment battleEnvironment;
@@ -47,7 +48,8 @@ public class GameManager : MonoBehaviour
             {
                 for (int z = 0; z < sizeZ; z++)
                 {
-                    CreateTile(x, y, z);
+                    if (instantiateTiles)
+                        CreateTile(x, y, z);
                 }
             }
         }
