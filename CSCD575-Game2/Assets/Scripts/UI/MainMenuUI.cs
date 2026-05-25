@@ -4,9 +4,11 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 
+
 public class MainMenuUI : MonoBehaviour
 {
 
+    [SerializeField] private SceneLoader manager;
     private Button newGame;
     private Button settings;
     private Button quit;
@@ -30,7 +32,8 @@ public class MainMenuUI : MonoBehaviour
 
     private void OnClickNewGame(ClickEvent clicked)
     {
-        Debug.Log("You pressed new game!");
+        //load the 'Main' scene
+        manager.LoadByName("Main");
     }
 
     private void OnNewGameDisable()
