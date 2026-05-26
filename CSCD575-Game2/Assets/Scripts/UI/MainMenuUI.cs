@@ -37,7 +37,7 @@ public class MainMenuUI : MonoBehaviour
         quit = root.Q("Quit") as Button;
         quit.RegisterCallback<ClickEvent>(OnClickQuit);
 
-        manager.ShowMainMenu();
+        // manager.ShowMainMenu();
 
     }
 
