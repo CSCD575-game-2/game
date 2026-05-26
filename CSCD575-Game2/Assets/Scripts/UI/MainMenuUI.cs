@@ -8,56 +8,77 @@ using UnityEngine.SceneManagement;
 public class MainMenuUI : MonoBehaviour
 {
 
+    // This is so we can add and edit a scene manager from the Unity editor, while still keeping variables private and inaccessible from other scripts.
     [SerializeField] private SceneLoader manager;
+
+    // Self explanatory, we are pre-instatiating buttons so we don't have to pass buttons as references in the script
     private Button newGame;
     private Button settings;
     private Button quit;
     // private UIDocument uiDoc;
     // private VisualElement root;
+
+    // Once the game object is enabeld this runs
     private void OnEnable()
     {
         VisualElement root = GetComponent<UIDocument>().rootVisualElement;
 
 
+        // New Game button(load to the 'Main' scene of the game)
         newGame = root.Q<Button>("NewGame") as Button;
         newGame.RegisterCallback<ClickEvent>(OnClickNewGame);
 
+        // Settings button(load the settings UI from the current UI context)
         settings = root.Q("Settings") as Button;
         settings.RegisterCallback<ClickEvent>(OnClickSettings);
 
+        // Quit button(Quit out of the application)
         quit = root.Q("Quit") as Button;
         quit.RegisterCallback<ClickEvent>(OnClickQuit);
 
     }
 
+    // New game button scripts
     private void OnClickNewGame(ClickEvent clicked)
     {
         //load the 'Main' scene
+        //Debug.Log("You pressed new game!");
+        OnNewGameDisable();
+        OnSettingsDisable();
+        OnQuitDisable();
         manager.LoadByName("Main");
     }
 
+    // Clears up any calls 'New Game' button makes once scene is unloaded.
     private void OnNewGameDisable()
     {
         newGame.UnregisterCallback<ClickEvent>(OnClickNewGame);
     }
 
 
+    // Self explanatory
     private void OnClickSettings(ClickEvent clicked)
     {
         Debug.Log("You pressed settings!");
     }
 
+    // Again, unregisters button calls when new scene is loaded
     private void OnSettingsDisable()
     {
         settings.UnregisterCallback<ClickEvent>(OnClickSettings);
     }
 
 
+    // Again, self explanatory
     private void OnClickQuit(ClickEvent clicked)
     {
-        Debug.Log("You pressed quit!");
+        //Debug.Log("You pressed quit!");
+
+        //This won't do anything in the Unity Editor view, but it will quit out once we have a proper build
+        Application.Quit();
     }
 
+    // See above 'button'Disable() functions for explanation
     private void OnQuitDisable()
     {
         quit.UnregisterCallback<ClickEvent>(OnClickQuit);
