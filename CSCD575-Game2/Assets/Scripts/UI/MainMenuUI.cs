@@ -9,11 +9,12 @@ public class MainMenuUI : MonoBehaviour
 {
 
     // This is so we can add and edit a scene manager from the Unity editor, while still keeping variables private and inaccessible from other scripts.
-    [SerializeField] private SceneLoader manager;
+    [SerializeField] private SceneLoader loader;
+    [SerializeField] private UIMainMenuManager manager;
 
     // Self explanatory, we are pre-instatiating buttons so we don't have to pass buttons as references in the script
     private Button newGame;
-    private Button settings;
+    private Button credits;
     private Button quit;
     // private UIDocument uiDoc;
     // private VisualElement root;
@@ -28,13 +29,15 @@ public class MainMenuUI : MonoBehaviour
         newGame = root.Q<Button>("NewGame") as Button;
         newGame.RegisterCallback<ClickEvent>(OnClickNewGame);
 
-        // Settings button(load the settings UI from the current UI context)
-        settings = root.Q("Settings") as Button;
-        settings.RegisterCallback<ClickEvent>(OnClickSettings);
+        // credits button(load the credits UI from the current UI context)
+        credits = root.Q("Credits") as Button;
+        credits.RegisterCallback<ClickEvent>(OnClickCredits);
 
         // Quit button(Quit out of the application)
         quit = root.Q("Quit") as Button;
         quit.RegisterCallback<ClickEvent>(OnClickQuit);
+
+        manager.ShowMainMenu();
 
     }
 
@@ -44,9 +47,9 @@ public class MainMenuUI : MonoBehaviour
         //load the 'Main' scene
         //Debug.Log("You pressed new game!");
         OnNewGameDisable();
-        OnSettingsDisable();
+        OnCreditsDisable();
         OnQuitDisable();
-        manager.LoadByName("Main");
+        loader.LoadByName("Main");
     }
 
     // Clears up any calls 'New Game' button makes once scene is unloaded.
@@ -57,15 +60,17 @@ public class MainMenuUI : MonoBehaviour
 
 
     // Self explanatory
-    private void OnClickSettings(ClickEvent clicked)
+    private void OnClickCredits(ClickEvent clicked)
     {
-        Debug.Log("You pressed settings!");
+        //Debug.Log("You pressed credits!");
+        manager.ShowCredits();
+        
     }
 
     // Again, unregisters button calls when new scene is loaded
-    private void OnSettingsDisable()
+    private void OnCreditsDisable()
     {
-        settings.UnregisterCallback<ClickEvent>(OnClickSettings);
+        credits.UnregisterCallback<ClickEvent>(OnClickCredits);
     }
 
 
