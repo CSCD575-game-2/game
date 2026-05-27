@@ -49,6 +49,9 @@ public class SpaceshipAgent : MonoBehaviour
     [SerializeField] private float maxMoveSpeed = 8f;
     private Vector3 moveVelocity;
 
+    [SerializeField] private GameObject explosionPrefab;
+    [SerializeField] private float destroyDelay = 0.4f;
+
     public void PlayAttackEffect(Vector3 targetWorldPos)
     {
         StartCoroutine(AttackEffect(targetWorldPos));
@@ -107,18 +110,40 @@ public class SpaceshipAgent : MonoBehaviour
         currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
 
-    if (currentHealth <= 0f)
-    {
-        status = ShipStatus.Destroyed;
-
-        if (AudioManager.Instance != null)
+        if (currentHealth <= 0f)
         {
-            AudioManager.Instance.PlayExplosion();
+            status = ShipStatus.Destroyed;
+            ExplodeAndDisappear();
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayExplosion();
+            }
+
+            gameObject.SetActive(false);
         }
 
-        gameObject.SetActive(false);
     }
 
+    private void ExplodeAndDisappear()
+    {
+        if (explosionPrefab != null)
+        {
+            Debug.Log("BOOOOM!");
+            Instantiate(
+                    explosionPrefab,
+                    transform.position,
+                    Quaternion.identity
+                    );
+        }
+
+        StartCoroutine(DisappearAfterExplosion());
+    }
+
+    private IEnumerator DisappearAfterExplosion()
+    {
+        yield return new WaitForSeconds(destroyDelay);
+        gameObject.SetActive(false);
     }
 
     IEnumerator RunEpisode()
