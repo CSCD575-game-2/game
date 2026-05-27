@@ -256,6 +256,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2053191165}
   - component: {fileID: 2053191164}
+  - component: {fileID: 2053191168}
+  - component: {fileID: 2053191167}
   - component: {fileID: 2053191166}
   m_Layer: 5
   m_Name: Main-Menu-UI
@@ -314,6 +316,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf352e4a7ac87834b555a92bef1a785, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenuUI
+  loader: {fileID: 2053191168}
+--- !u!114 &2053191167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2053191163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1950da03d39f25732a37f33a0bb8a3c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuController
+--- !u!114 &2053191168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2053191163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 825190b3240cf3525b391cfc6dc7bdaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneLoader
 --- !u!1 &2058397880
 GameObject:
   m_ObjectHideFlags: 0

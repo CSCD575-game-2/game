@@ -10,6 +10,7 @@ public class MainMenuUI : MonoBehaviour
     private Button newGame;
     private Button credits;
     private Button quit;
+    [SerializeField] private SceneLoader loader;
     // private UIDocument uiDoc;
     // private VisualElement root;
     private void OnEnable()
@@ -30,7 +31,8 @@ public class MainMenuUI : MonoBehaviour
 
     private void OnClickNewGame(ClickEvent clicked)
     {
-        Debug.Log("You pressed new game!");
+        // Debug.Log("You pressed new game!");
+        loader.LoadByName("Main");
     }
 
     private void OnNewGameDisable()
