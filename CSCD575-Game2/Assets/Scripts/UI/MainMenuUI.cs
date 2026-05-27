@@ -8,7 +8,7 @@ public class MainMenuUI : MonoBehaviour
 {
 
     private Button newGame;
-    private Button settings;
+    private Button credits;
     private Button quit;
     // private UIDocument uiDoc;
     // private VisualElement root;
@@ -20,8 +20,8 @@ public class MainMenuUI : MonoBehaviour
         newGame = root.Q<Button>("NewGame") as Button;
         newGame.RegisterCallback<ClickEvent>(OnClickNewGame);
 
-        settings = root.Q("Settings") as Button;
-        settings.RegisterCallback<ClickEvent>(OnClickSettings);
+        credits = root.Q("Credits") as Button;
+        credits.RegisterCallback<ClickEvent>(OnClickCredits);
 
         quit = root.Q("Quit") as Button;
         quit.RegisterCallback<ClickEvent>(OnClickQuit);
@@ -39,20 +39,21 @@ public class MainMenuUI : MonoBehaviour
     }
 
 
-    private void OnClickSettings(ClickEvent clicked)
+    private void OnClickCredits(ClickEvent clicked)
     {
-        Debug.Log("You pressed settings!");
+        Debug.Log("You pressed credits!");
     }
 
-    private void OnSettingsDisable()
+    private void OnCreditsDisable()
     {
-        settings.UnregisterCallback<ClickEvent>(OnClickSettings);
+        credits.UnregisterCallback<ClickEvent>(OnClickCredits);
     }
 
 
     private void OnClickQuit(ClickEvent clicked)
     {
-        Debug.Log("You pressed quit!");
+        // Debug.Log("You pressed quit!");
+        Application.Quit();
     }
 
     private void OnQuitDisable()
