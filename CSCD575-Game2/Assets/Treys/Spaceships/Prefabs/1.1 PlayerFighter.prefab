@@ -515,6 +515,7 @@ MonoBehaviour:
   role: 0
   status: 0
   team: 0
+  lowFuelHelpThreshold: 0.3
   maxSteps: 200
   currentState:
     x: 0
@@ -528,6 +529,8 @@ MonoBehaviour:
   rotationOffsetEuler: {x: 0, y: 0, z: 0}
   attackLine: {fileID: 839824087226111875}
   attackEffectTime: 0.08
+  accelerationTime: 0.1
+  maxMoveSpeed: 50
 --- !u!120 &839824087226111875
 LineRenderer:
   serializedVersion: 3

@@ -44,6 +44,11 @@ public class SpaceshipAgent : MonoBehaviour
     [SerializeField] private LineRenderer attackLine;
     [SerializeField] private float attackEffectTime = 0.08f;
 
+
+    [SerializeField] private float accelerationTime = 0.25f;
+    [SerializeField] private float maxMoveSpeed = 8f;
+    private Vector3 moveVelocity;
+
     public void PlayAttackEffect(Vector3 targetWorldPos)
     {
         StartCoroutine(AttackEffect(targetWorldPos));
@@ -260,41 +265,81 @@ public class SpaceshipAgent : MonoBehaviour
         return false;
     }
 
+    //IEnumerator MoveTo(Vector3 target)
+    //{
+        //Vector3 start = transform.position;
+
+        //Vector3 mid = (start + target) * 0.5f;
+
+        //Vector3 sideways = Vector3.Cross(
+                //(target - start).normalized,
+                //Vector3.up
+                //);
+
+        //mid += sideways * Random.Range(-2.5f, 2.5f);
+        //mid += Vector3.up * Random.Range(0.1f, 0.4f);
+
+        //float t = 0f;
+
+        //float duration = moveDuration; 
+
+        //while (t < 1.0f)
+        //{
+            //t += Time.deltaTime / duration;
+
+            //float smoothT =
+                //Mathf.SmoothStep(
+                        //0f,
+                        //1f,
+                        //Mathf.SmoothStep(0f, 1f, t)
+                        //);
+
+            //Vector3 a = Vector3.Lerp(start, mid, smoothT);
+            //Vector3 b = Vector3.Lerp(mid, target, smoothT);
+
+            //Vector3 pos = Vector3.Lerp(a, b, smoothT);
+
+            //Vector3 direction = pos - transform.position;
+
+            //if (direction.sqrMagnitude > 0.001f)
+            //{
+                //Quaternion targetRotation =
+                    //Quaternion.LookRotation(direction.normalized, Vector3.up)
+                    //* Quaternion.Euler(rotationOffsetEuler);
+
+                //transform.rotation = Quaternion.Slerp(
+                        //transform.rotation,
+                        //targetRotation,
+                        //rotateSpeed * Time.deltaTime
+                        //);
+            //}
+
+            //transform.position = pos;
+
+            //yield return null;
+        //}
+
+        //transform.position = target;
+    //}
+
+
     IEnumerator MoveTo(Vector3 target)
     {
-        Vector3 start = transform.position;
+        float stopDistance = 0.05f;
 
-        Vector3 mid = (start + target) * 0.5f;
-
-        Vector3 sideways = Vector3.Cross(
-                (target - start).normalized,
-                Vector3.up
-                );
-
-        mid += sideways * Random.Range(-2.5f, 2.5f);
-        mid += Vector3.up * Random.Range(0.1f, 0.4f);
-
-        float t = 0f;
-
-        float duration = moveDuration; 
-
-        while (t < 1.0f)
+        while (Vector3.Distance(transform.position, target) > stopDistance)
         {
-            t += Time.deltaTime / duration;
+            Vector3 previousPosition = transform.position;
 
-            float smoothT =
-                Mathf.SmoothStep(
-                        0f,
-                        1f,
-                        Mathf.SmoothStep(0f, 1f, t)
-                        );
+            transform.position = Vector3.SmoothDamp(
+                    transform.position,
+                    target,
+                    ref moveVelocity,
+                    accelerationTime,
+                    maxMoveSpeed
+                    );
 
-            Vector3 a = Vector3.Lerp(start, mid, smoothT);
-            Vector3 b = Vector3.Lerp(mid, target, smoothT);
-
-            Vector3 pos = Vector3.Lerp(a, b, smoothT);
-
-            Vector3 direction = pos - transform.position;
+            Vector3 direction = transform.position - previousPosition;
 
             if (direction.sqrMagnitude > 0.001f)
             {
@@ -309,12 +354,12 @@ public class SpaceshipAgent : MonoBehaviour
                         );
             }
 
-            transform.position = pos;
-
             yield return null;
         }
 
-        transform.position = target;}
+        transform.position = target;
+    }
+
 
     //Vector3 GridToWorld(GridPosition pos)
     //{
