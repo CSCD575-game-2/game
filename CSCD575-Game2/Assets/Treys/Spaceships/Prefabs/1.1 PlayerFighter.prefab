@@ -432,15 +432,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 570632013832535785, guid: c484e9ee88e6f4942ad5c8a0461c6493, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 692.89014
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 570632013832535785, guid: c484e9ee88e6f4942ad5c8a0461c6493, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.00004
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 570632013832535785, guid: c484e9ee88e6f4942ad5c8a0461c6493, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 362.915
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 570632013832535785, guid: c484e9ee88e6f4942ad5c8a0461c6493, type: 3}
       propertyPath: m_LocalRotation.w
@@ -473,6 +473,10 @@ PrefabInstance:
     - target: {fileID: 909896894237664339, guid: c484e9ee88e6f4942ad5c8a0461c6493, type: 3}
       propertyPath: m_Name
       value: 1.1 PlayerFighter
+      objectReference: {fileID: 0}
+    - target: {fileID: 1702472911302673798, guid: c484e9ee88e6f4942ad5c8a0461c6493, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 4294967295
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -530,7 +534,9 @@ MonoBehaviour:
   attackLine: {fileID: 839824087226111875}
   attackEffectTime: 0.08
   accelerationTime: 0.1
-  maxMoveSpeed: 50
+  maxMoveSpeed: 80
+  explosionPrefab: {fileID: 0}
+  destroyDelay: 0.4
 --- !u!120 &839824087226111875
 LineRenderer:
   serializedVersion: 3
