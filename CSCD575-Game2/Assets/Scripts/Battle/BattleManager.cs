@@ -9,16 +9,20 @@ public class BattleManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private Button startButton;
     [SerializeField] private Button deployFighterButton;
+    [SerializeField] private Button deployResupplyButton;
     [SerializeField] private Button endBattleButton;
 
     [Header("Prefabs")]
     [SerializeField] private SpaceshipAgent fighterPrefab;
     [SerializeField] private SpaceshipAgent enemyFighterPrefab;
 
+    [SerializeField] private SpaceshipAgent resupplyPrefab;
+
     [Header("Spawn Settings")]
     [SerializeField] private Transform playerSpawnPoint;
     [SerializeField] private float spacing = 1.2f;
     [SerializeField] private int startingFighters = 5;
+    [SerializeField] private int startingResupplyShips = 2;
     [SerializeField] private int startingEnemyFighters = 5;
     [SerializeField] private Camera battleCamera;
     [SerializeField] private float enemyDeployInterval = 5f;
@@ -48,11 +52,13 @@ public class BattleManager : MonoBehaviour
         CreateEnemyFleet();
 
         deployFighterButton.interactable = false;
+        deployResupplyButton.interactable = false;
         endBattleButton.interactable = false;
 
         startButton.onClick.AddListener(StartEpisode);
         endBattleButton.onClick.AddListener(EndEpisode);
         deployFighterButton.onClick.AddListener(DeployFighter);
+        deployResupplyButton.onClick.AddListener(DeployResupply);
 
         aggressionSlider.onValueChanged.AddListener(UpdateAggression);
         exploreExploitSlider.onValueChanged.AddListener(UpdateFleetEpsilon);
@@ -107,6 +113,7 @@ public class BattleManager : MonoBehaviour
 
         startButton.interactable = true;
         deployFighterButton.interactable = false;
+        deployResupplyButton.interactable = false;
         endBattleButton.interactable = false;
 
         Debug.Log(playerWon ? "Victory!" : "Defeat!");
@@ -160,6 +167,24 @@ public class BattleManager : MonoBehaviour
 
             battleEnvironment.RegisterShip(ship);
         }
+
+        for (int i = 0; i < startingResupplyShips; i++)
+        {
+            SpaceshipAgent ship = Instantiate(
+                resupplyPrefab,
+                battleEnvironment.GridToWorld(battleEnvironment.playerMothershipPosition),
+                Quaternion.identity
+            );
+
+            ship.role = ShipRole.Resupply;
+            ship.status = ShipStatus.Docked;
+            ship.team = ShipTeam.Player;
+            ship.directive = ShipDirective.ReturnHome;
+
+            ship.gameObject.SetActive(false);
+
+            battleEnvironment.RegisterShip(ship);
+        }
     }
 
     private void CreateEnemyFleet()
@@ -189,7 +214,8 @@ public class BattleManager : MonoBehaviour
         foreach (SpaceshipAgent ship in battleEnvironment.allShips)
         {
             if (ship.status != ShipStatus.Docked &&
-                ship.status != ShipStatus.Destroyed)
+                ship.status != ShipStatus.Destroyed &&
+                ship.status != ShipStatus.Disabled)
             {
                 return false;
             }
@@ -204,6 +230,7 @@ public class BattleManager : MonoBehaviour
 
         startButton.interactable = true;
         deployFighterButton.interactable = false;
+        deployResupplyButton.interactable = false;
         endBattleButton.interactable = false;
 
         Debug.Log("Episode finished. Buttons reset.");
@@ -217,9 +244,13 @@ public class BattleManager : MonoBehaviour
             if (ship.team != ShipTeam.Player)
                 continue;
 
-            if (ship.Policy is TDPolicy tdPolicy)
+            if (ship.FighterPolicy is TDPolicy tdPolicy)
             {
                 tdPolicy.Epsilon = -value;
+            }
+            if (ship.ResupplyPolicy is ResupplyTDPolicy resupplyPolicy)
+            {
+                resupplyPolicy.Epsilon = -value;
             }
         }
     }
@@ -232,9 +263,13 @@ public class BattleManager : MonoBehaviour
             if (ship.team != ShipTeam.Player)
                 continue;
 
-            if (ship.Policy is TDPolicy tdPolicy)
+            if (ship.FighterPolicy is TDPolicy tdPolicy)
             {
                 tdPolicy.Gamma = value;
+            }
+            if (ship.ResupplyPolicy is ResupplyTDPolicy resupplyPolicy)
+            {
+                resupplyPolicy.Gamma = value;
             }
         }
     }
@@ -247,9 +282,13 @@ public class BattleManager : MonoBehaviour
             if (ship.team != ShipTeam.Player)
                 continue;
 
-            if (ship.Policy is TDPolicy tdPolicy)
+            if (ship.FighterPolicy is TDPolicy tdPolicy)
             {
                 tdPolicy.Alpha = value;
+            }
+            if (ship.ResupplyPolicy is ResupplyTDPolicy resupplyPolicy)
+            {
+                resupplyPolicy.Alpha = value;
             }
         }
     }
@@ -294,6 +333,7 @@ public class BattleManager : MonoBehaviour
         startButton.interactable = false;
         endBattleButton.interactable = true;
         deployFighterButton.interactable = true;
+        deployResupplyButton.interactable = true;
 
         battleEnvironment.SetEnemyAggression(enemyStartingAggression);
 
@@ -309,6 +349,7 @@ public class BattleManager : MonoBehaviour
         //battleEnvironment.SetReturnHomeGoal();
 
         deployFighterButton.interactable = false;
+        deployResupplyButton.interactable = false;
         endBattleButton.interactable = false;
 
         foreach (SpaceshipAgent ship in battleEnvironment.allShips)
@@ -349,13 +390,48 @@ public class BattleManager : MonoBehaviour
         ship.status = ShipStatus.Active;
         ship.directive = ShipDirective.Attack;
 
-        ship.Initialize(
+        ship.InitializeFighter(
             battleEnvironment,
-            fighterPolicy,
-            battleEnvironment.playerMothershipPosition
+            battleEnvironment.playerMothershipPosition,
+            fighterPolicy
         );
 
         Debug.Log("Docked fighter deployed");
+    }
+
+    public void DeployResupply()
+    {
+        if (phase != BattlePhase.ActiveBattle)
+            return;
+
+        SpaceshipAgent ship = battleEnvironment.GetDockedResupplyShip();
+
+        if (ship == null)
+        {
+            Debug.Log("No docked resupply ships available");
+            deployResupplyButton.interactable = false;
+            return;
+        }
+
+        ResupplyTDPolicy resupplyPolicy = new ResupplyTDPolicy(
+            alpha: adaptiveSlider.value,
+            gamma: strategicSlider.value,
+            epsilon: exploreExploitSlider.value
+        );
+
+        ship.gameObject.SetActive(true);
+
+        ship.role = ShipRole.Resupply;
+        ship.status = ShipStatus.Active;
+        ship.directive = ShipDirective.Resupply;
+
+        ship.InitializeResupply(
+            battleEnvironment,
+            battleEnvironment.playerMothershipPosition,
+            resupplyPolicy
+        );
+
+        Debug.Log("Docked resupply ship deployed");
     }
 
     private void UpdateAggression(float value)
@@ -382,10 +458,10 @@ public class BattleManager : MonoBehaviour
         ship.status = ShipStatus.Active;
         ship.directive = ShipDirective.Attack;
 
-        ship.Initialize(
+        ship.InitializeFighter(
             battleEnvironment,
-            enemyPolicy,
-            battleEnvironment.enemyMothershipPosition
+            battleEnvironment.enemyMothershipPosition,
+            enemyPolicy
         );
 
         Debug.Log("Enemy fighter deployed");

@@ -1,9 +1,10 @@
+
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TDPolicy : IRLPolicy<ShipState>
+public class ResupplyTDPolicy : IRLPolicy<ResupplyState>
 {
-    private readonly Dictionary<(ShipState, string), float> qValues = new();
+    private readonly Dictionary<(ResupplyState, string), float> qValues = new();
 
     private string[] actions =
     {
@@ -14,23 +15,18 @@ public class TDPolicy : IRLPolicy<ShipState>
         "Forward",
         "Back",
         "HoldPosition",
-        "AttackUp",
-        "AttackDown",
-        "AttackLeft",
-        "AttackRight",
-        "AttackForward",
-        "AttackBack"
+        "Resupply"
     };
 
     public float Epsilon { get; set; }
     public float Alpha { get; set; }
     public float Gamma { get; set; }
 
-    public TDPolicy(float alpha = 0.2f, float gamma = 0.9f, float epsilon = 0.2f)
+    public ResupplyTDPolicy(float alpha = 0.2f, float gamma = 0.9f, float epsilon = 0.2f)
     {
-        Epsilon = epsilon;
         Alpha = alpha;
         Gamma = gamma;
+        Epsilon = epsilon;
     }
 
     public string ChooseAction(SpaceshipAgent ship, BattleEnvironment env)
@@ -45,14 +41,11 @@ public class TDPolicy : IRLPolicy<ShipState>
                 "Forward",
                 "Back",
                 "HoldPosition",
-                "AttackLeft",
-                "AttackRight",
-                "AttackForward",
-                "AttackBack"
+                "Resupply",
             };
         }
 
-        ShipState state = env.GetShipState(ship);
+        ResupplyState state = env.GetResupplyState(ship);
 
         // explore
         if (Random.value < Epsilon)
@@ -79,10 +72,10 @@ public class TDPolicy : IRLPolicy<ShipState>
     }
 
     public void Learn(
-            ShipState state,
+            ResupplyState state,
             string action,
             float reward,
-            ShipState nextState)
+            ResupplyState nextState)
     {
         float oldQ = GetQ(state, action);
 
@@ -98,7 +91,7 @@ public class TDPolicy : IRLPolicy<ShipState>
         qValues[(state, action)] = newQ;
     }
 
-    private float GetQ(ShipState state, string action)
+    private float GetQ(ResupplyState state, string action)
     {
         var key = (state, action);
 
@@ -107,6 +100,4 @@ public class TDPolicy : IRLPolicy<ShipState>
 
         return qValues[key];
     }
-
-    
 }
