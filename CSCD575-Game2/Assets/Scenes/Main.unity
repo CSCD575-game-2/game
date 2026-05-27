@@ -194,6 +194,82 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 22418689}
   m_CullTransparentMesh: 1
+--- !u!1001 &65584465
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3512555309104794465, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: maxSteps
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 5181181404580091872, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 466.0671
+      objectReference: {fileID: 0}
+    - target: {fileID: 5181181404580091872, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 291.95404
+      objectReference: {fileID: 0}
+    - target: {fileID: 5181181404580091872, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 431.88672
+      objectReference: {fileID: 0}
+    - target: {fileID: 5181181404580091872, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5181181404580091872, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5181181404580091872, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5181181404580091872, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5181181404580091872, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5181181404580091872, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5181181404580091872, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5524950984128417114, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: m_Name
+      value: 11.5 Player Resupply
+      objectReference: {fileID: 0}
+    - target: {fileID: 9045060536055346887, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: targetCamera
+      value: 
+      objectReference: {fileID: 330585545}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+--- !u!114 &65584467 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3512555309104794465, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+  m_PrefabInstance: {fileID: 65584465}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef67654f7fca549cf96c47be81abc71f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpaceshipAgent
 --- !u!1 &86538299
 GameObject:
   m_ObjectHideFlags: 0
@@ -6832,15 +6908,18 @@ MonoBehaviour:
   battleEnvironment: {fileID: 415944129}
   startButton: {fileID: 200111809}
   deployFighterButton: {fileID: 660473693}
+  deployResupplyButton: {fileID: 1037782038}
   endBattleButton: {fileID: 858801389}
   fighterPrefab: {fileID: 2964645160267510233}
   enemyFighterPrefab: {fileID: 1539822525}
+  resupplyPrefab: {fileID: 65584467}
   playerSpawnPoint: {fileID: 3102909751507431731}
   spacing: 1.2
   startingFighters: 10
-  startingEnemyFighters: 10
+  startingResupplyShips: 5
+  startingEnemyFighters: 5
   battleCamera: {fileID: 330585545}
-  enemyDeployInterval: 2
+  enemyDeployInterval: 3
   enemyStartingAggression: 0.2
   enemyAggressionIncreaseRate: 0.05
   playerMothershipPrefab: {fileID: 3102909751507431730}
@@ -9059,3 +9138,4 @@ SceneRoots:
   - {fileID: 3102909751507431729}
   - {fileID: 645630377}
   - {fileID: 1659734883}
+  - {fileID: 65584465}

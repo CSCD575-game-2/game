@@ -4,14 +4,20 @@ using System.Collections;
 public class SpaceshipAgent : MonoBehaviour
 {
     public BattleEnvironment env;
-    private IRLPolicy policy;
-    public IRLPolicy Policy => policy; 
+
+    private TDPolicy fighterPolicy;
+    private ResupplyTDPolicy resupplyPolicy;
+
+    public TDPolicy FighterPolicy => fighterPolicy; 
+    public ResupplyTDPolicy ResupplyPolicy => resupplyPolicy;
+
     public ShipDirective directive;
     public ShipRole role;
     public ShipStatus status;
 
     public ShipTeam team;
 
+    [SerializeField] private float lowFuelHelpThreshold = 0.3f;
 
     [SerializeField] private int maxSteps = 100;
     private int stepsUsed = 0;
@@ -43,6 +49,7 @@ public class SpaceshipAgent : MonoBehaviour
         StartCoroutine(AttackEffect(targetWorldPos));
     }
 
+
     private IEnumerator AttackEffect(Vector3 targetWorldPos)
     {
         attackLine.enabled = true;
@@ -54,11 +61,10 @@ public class SpaceshipAgent : MonoBehaviour
         attackLine.enabled = false;
     }
 
-    public void Initialize(BattleEnvironment env, IRLPolicy policy, GridPosition startState)
+    private void Initialize(BattleEnvironment env, GridPosition startState)
     {
         currentHealth = maxHealth;
         this.env = env; 
-        this.policy = policy;
 
         // get spacing from GameManager
         GameManager gm = FindObjectOfType<GameManager>();
@@ -70,7 +76,25 @@ public class SpaceshipAgent : MonoBehaviour
         transform.position = env.GridToWorld(currentState);
 
         StartCoroutine(RunEpisode());
-        //RunEpisode();
+    }
+
+    public void InitializeFighter(
+        BattleEnvironment env,
+        GridPosition startState,
+        TDPolicy policy)
+    {
+        this.fighterPolicy = policy;
+        this.role = ShipRole.Fighter;
+        Initialize(env, startState);
+    }
+    public void InitializeResupply(
+            BattleEnvironment env,
+            GridPosition startState,
+            ResupplyTDPolicy policy)
+    {
+        this.resupplyPolicy = policy;
+        this.role = ShipRole.Resupply;
+        Initialize(env, startState);
     }
 
     public void TakeDamage(float amount)
@@ -92,8 +116,15 @@ public class SpaceshipAgent : MonoBehaviour
 
     }
 
-
     IEnumerator RunEpisode()
+    {
+        if (role == ShipRole.Resupply)
+            yield return RunResupplyEpisode();
+        else
+            yield return RunFighterEpisode();
+    }
+
+    IEnumerator RunFighterEpisode()
     {
         stepsUsed = 0; 
 
@@ -101,7 +132,7 @@ public class SpaceshipAgent : MonoBehaviour
         {
             ShipState state = env.GetShipState(this);
 
-            string action = policy.ChooseAction(this, env);
+            string action = fighterPolicy.ChooseAction(this, env);
 
             float reward = 0f;
 
@@ -111,7 +142,7 @@ public class SpaceshipAgent : MonoBehaviour
 
                 ShipState nextState = env.GetShipState(this);
 
-                policy.Learn(state, action, reward, nextState);
+                fighterPolicy.Learn(state, action, reward, nextState);
 
                 yield return new WaitForSeconds(stepDelay);
                 stepsUsed++;
@@ -119,7 +150,7 @@ public class SpaceshipAgent : MonoBehaviour
             }
 
             GridPosition nextGridState = env.GetNextState(currentState, action);
-            reward = env.GetReward(this, currentState, action, nextGridState);
+            reward = env.GetMovementReward(this, currentState, action, nextGridState);
 
             yield return MoveTo(env.GridToWorldWithNoise(nextGridState));
 
@@ -127,31 +158,106 @@ public class SpaceshipAgent : MonoBehaviour
 
             ShipState nextShipState = env.GetShipState(this);
 
-            policy.Learn(state, action, reward, nextShipState);
+            fighterPolicy.Learn(state, action, reward, nextShipState);
 
             stepsUsed++;
 
-            if (status == ShipStatus.ReturningHome &&
-                    env.IsAtHomeMothership(this))
+            //if (status == ShipStatus.ReturningHome &&
+                    //env.IsAtHomeMothership(this))
+            //{
+                //env.DockShip(this);
+                //gameObject.SetActive(false); 
+                //Debug.Log($"{role} docked at mothership");
+                //break;
+            //}
+
+            //if (stepsUsed > maxSteps)
+            //{
+                //status = ShipStatus.Destroyed;
+                //Debug.Log($"{role} destroyed: exceeded max steps");
+                //break;
+            //}
+
+            if (ShouldEndEpisode())
             {
-                env.DockShip(this);
-                gameObject.SetActive(false); 
-                Debug.Log($"{role} docked at mothership");
                 break;
             }
-
-            if (stepsUsed > maxSteps)
-            {
-                status = ShipStatus.Destroyed;
-                Debug.Log($"{role} destroyed: exceeded max steps");
-                break;
-            }
-
             yield return new WaitForSeconds(stepDelay);
 
         }
 
         Debug.Log($"{role} episode finished");
+    }
+
+    IEnumerator RunResupplyEpisode()
+    {
+        stepsUsed = 0;
+
+
+        while (status == ShipStatus.Active || status == ShipStatus.ReturningHome)
+        {
+            ResupplyState state = env.GetResupplyState(this);
+
+            string action = resupplyPolicy.ChooseAction(this, env);
+
+            float reward = 0f;
+
+            if (env.IsResupplyAction(action))
+            {
+                reward = env.ResolveResupply(this, action);
+
+                ResupplyState nextState = env.GetResupplyState(this);
+
+                resupplyPolicy.Learn(state, action, reward, nextState);
+
+                yield return new WaitForSeconds(stepDelay);
+                stepsUsed++;
+                continue;
+            }
+
+            GridPosition nextGridState = env.GetNextState(currentState, action);
+            reward = env.GetMovementReward(this, currentState, action, nextGridState);
+
+            yield return MoveTo(env.GridToWorldWithNoise(nextGridState));
+
+            currentState = nextGridState;
+
+            ResupplyState nextResupplyState = env.GetResupplyState(this);
+
+            resupplyPolicy.Learn(state, action, reward, nextResupplyState);
+
+            stepsUsed++;
+
+            if (ShouldEndEpisode())
+            {
+                break;
+            }
+            yield return new WaitForSeconds(stepDelay);
+        }
+
+        Debug.Log($"{role} episode finished");
+    }
+
+
+    private bool ShouldEndEpisode()
+    {
+        if (status == ShipStatus.ReturningHome &&
+                env.IsAtHomeMothership(this))
+        {
+            env.DockShip(this);
+            gameObject.SetActive(false);
+            Debug.Log($"{role} docked at mothership");
+            return true;
+        }
+
+        //if (stepsUsed > maxSteps)
+        //{
+            //status = ShipStatus.Destroyed;
+            //Debug.Log($"{role} destroyed: exceeded max steps");
+            //return true;
+        //}
+
+        return false;
     }
 
     IEnumerator MoveTo(Vector3 target)
@@ -226,6 +332,24 @@ public class SpaceshipAgent : MonoBehaviour
 
     public bool IsTerminal()
     {
-        return status == ShipStatus.Destroyed || status == ShipStatus.Docked;
+        return status == ShipStatus.Destroyed || status == ShipStatus.Docked || status == ShipStatus.Disabled;
     }
+
+    public bool NeedsHelp()
+    {
+        return (status == ShipStatus.Active || status == ShipStatus.Disabled || status == ShipStatus.ReturningHome)
+            && (
+                FuelPercent < lowFuelHelpThreshold ||
+                HealthPercent < 0.4f 
+            );
+    }
+
+    public void Refuel(float amount)
+    {
+        stepsUsed = Mathf.Max(0, stepsUsed - Mathf.RoundToInt(amount * maxSteps));
+        if (stepsUsed > 0) {
+            status = ShipStatus.Active;
+        }
+    }
+
 }

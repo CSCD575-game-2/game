@@ -5,6 +5,7 @@ public class BattleEnvironment : MonoBehaviour
 {
     public readonly List<SpaceshipAgent> allShips = new();
     public readonly List<SpaceshipAgent> dockedFighters = new();
+    public readonly List<SpaceshipAgent> dockedResupplyShips = new();
     public readonly List<SpaceshipAgent> dockedEnemyFighters = new();
 
     public int sizeX { get; private set; }
@@ -117,11 +118,29 @@ public class BattleEnvironment : MonoBehaviour
         {
             dockedEnemyFighters.Add(ship);
         }
+
+        if (ship.role == ShipRole.Resupply &&
+            ship.status == ShipStatus.Docked &&
+            ship.team == ShipTeam.Player &&
+            !dockedResupplyShips.Contains(ship))
+        {
+            dockedResupplyShips.Add(ship);
+        }
     }
 
     public void UnregisterShip(SpaceshipAgent ship)
     {
         allShips.Remove(ship);
+    }
+
+    public SpaceshipAgent GetDockedResupplyShip()
+    {
+        if (dockedResupplyShips.Count == 0)
+            return null;
+
+        SpaceshipAgent ship = dockedResupplyShips[0];
+        dockedResupplyShips.RemoveAt(0);
+        return ship;
     }
 
     public SpaceshipAgent GetDockedEnemyFighter()
@@ -248,7 +267,25 @@ public class BattleEnvironment : MonoBehaviour
             pos.z < sizeZ;
     }
 
-    public float GetReward(
+    public float GetMovementReward(
+            SpaceshipAgent ship,
+            GridPosition state,
+            string action,
+            GridPosition nextState)
+    {
+        if (ship.role == ShipRole.Resupply) {
+            return GetResupplyMovementReward(ship, state, action, nextState);
+        } 
+        else if (ship.role == ShipRole.Fighter)
+        {
+            return GetFighterMovementReward(ship, state, action, nextState);
+        }
+        else {
+            return -0.1f;
+        }
+    }
+
+    private float GetFighterMovementReward(
         SpaceshipAgent ship,
         GridPosition state,
         string action,
@@ -275,18 +312,74 @@ public class BattleEnvironment : MonoBehaviour
         else
             reward -= 0.2f;
 
-        //if (ship.role == ShipRole.Fighter)
-        //{
-            //reward += 0.2f;
-        //}
-
-        //if (ship.directive == ShipDirective.Attack)
-        //{
-            //reward += nextState.z * 0.05f;
-        //}
 
         return reward;
 
+    }
+
+    private float GetResupplyMovementReward(
+            SpaceshipAgent ship,
+            GridPosition state,
+            string action,
+            GridPosition nextState)
+    {
+        float reward = -0.1f;
+
+        SpaceshipAgent oldTarget = GetBestResupplyTarget(ship, state);
+        SpaceshipAgent newTarget = GetBestResupplyTarget(ship, nextState);
+
+        if (oldTarget == null && newTarget == null)
+            return reward - 0.2f;
+
+        if (newTarget != null)
+        {
+            float oldDistance = oldTarget == null
+                ? float.MaxValue
+                : GridDistance(state, oldTarget.CurrentState);
+
+            float newDistance = GridDistance(nextState, newTarget.CurrentState);
+
+            if (newDistance < oldDistance)
+                reward += 1f;
+            else if (newDistance > oldDistance)
+                reward -= 1f;
+        }
+
+        reward += CountNearbyFriendlyShips(nextState, ship.team, radius: 2) * 0.2f;
+
+        return reward;
+    }
+
+    private SpaceshipAgent GetBestResupplyTarget(SpaceshipAgent supplier, GridPosition pos)
+    {
+        SpaceshipAgent best = null;
+        float bestScore = float.NegativeInfinity;
+
+        foreach (SpaceshipAgent ship in allShips)
+        {
+            if (ship == supplier)
+                continue;
+
+            if (ship.team != supplier.team)
+                continue;
+
+            if (!ship.NeedsHelp())
+                continue;
+
+            float distance = GridDistance(pos, ship.CurrentState);
+            if (distance > 3)
+                continue;
+
+            float score = GetResupplyTargetScore(ship) - distance * 0.5f;
+
+            if (score > bestScore)
+            {
+                bestScore = score;
+                best = ship;
+            }
+        }
+
+        return best;
     }
 
     private int ManhattanDistance(GridPosition a, GridPosition b)
@@ -295,18 +388,6 @@ public class BattleEnvironment : MonoBehaviour
              + Mathf.Abs(a.y - b.y)
              + Mathf.Abs(a.z - b.z);
     }
-
-    //public void SetAttackGoal()
-    //{
-        //CurrentEnemyGoal = playerMothershipPosition;
-        //CurrentPlayerGoal = enemyMothershipPosition;
-    //}
-
-    //public void SetReturnHomeGoal()
-    //{
-        //CurrentEnemyGoal = enemyMothershipPosition;
-        //CurrentPlayerGoal = playerMothershipPosition;
-    //}
 
     public bool IsAtHomeMothership(SpaceshipAgent ship)
     {
@@ -325,6 +406,11 @@ public class BattleEnvironment : MonoBehaviour
     public bool IsAttackAction(string action)
     {
         return action.StartsWith("Attack");
+    }
+
+    public bool IsResupplyAction(string action)
+    {
+        return action == "Resupply";
     }
 
     public GridPosition GetAttackTarget(GridPosition state, string action)
@@ -384,10 +470,104 @@ public class BattleEnvironment : MonoBehaviour
 
         return 3f;
     }
+    
+    public float ResolveResupply(SpaceshipAgent supplier, string action)
+    {
+        if (action != "Resupply")
+            return 0f;
+
+        SpaceshipAgent target = GetBestAdjacentResupplyTarget(supplier);
+
+        if (target == null)
+            return -1f;
+
+        target.Refuel(25f);
+
+        if (target.role == ShipRole.Fighter)
+            return 8f;
+
+        if (target.role == ShipRole.Resupply)
+            return 2f;
+
+        return 1f;
+    }
+
+    private SpaceshipAgent GetBestAdjacentResupplyTarget(SpaceshipAgent supplier)
+    {
+        SpaceshipAgent best = null;
+        float bestScore = float.NegativeInfinity;
+
+        foreach (SpaceshipAgent ship in allShips)
+        {
+            if (ship == supplier)
+                continue;
+
+            if (ship.team != supplier.team)
+                continue;
+
+            if (!ship.NeedsHelp())
+                continue;
+
+            if (GridDistance(supplier.CurrentState, ship.CurrentState) > 1)
+                continue;
+
+            float score = GetResupplyTargetScore(ship);
+
+            if (score > bestScore)
+            {
+                bestScore = score;
+                best = ship;
+            }
+        }
+
+        return best;
+    }
+
+    private float GetResupplyTargetScore(SpaceshipAgent target)
+    {
+        float score = 0f;
+
+        if (target.role == ShipRole.Fighter)
+            score += 10f;
+        else if (target.role == ShipRole.Resupply)
+            score += 3f;
+
+        score += (1f - target.FuelPercent) * 5f;
+
+        score += CountNearbyFriendlyShips(target.CurrentState, target.team, radius: 2) * 0.5f;
+
+        return score;
+    }
+
+    private int CountNearbyFriendlyShips(GridPosition pos, ShipTeam team, int radius)
+    {
+        int count = 0;
+
+        foreach (SpaceshipAgent ship in allShips)
+        {
+            if (ship.team != team)
+                continue;
+
+            if (ship.status == ShipStatus.Destroyed)
+                continue;
+
+            if (GridDistance(pos, ship.CurrentState) <= radius)
+                count++;
+        }
+
+        return count;
+    }
+
+    private int GridDistance(GridPosition a, GridPosition b)
+    {
+        return Mathf.Abs(a.x - b.x)
+            + Mathf.Abs(a.y - b.y)
+            + Mathf.Abs(a.z - b.z);
+    }
 
     private Mothership GetEnemyMothershipAtPosition(
-    SpaceshipAgent attacker,
-    GridPosition pos)
+            SpaceshipAgent attacker,
+            GridPosition pos)
     {
         Debug.Log("checking for mothership at position: " + pos + " player mothership position: " + playerMothershipPosition + " enemy mothership position: " + enemyMothershipPosition);
         if (attacker.team == ShipTeam.Player &&
@@ -434,6 +614,39 @@ public class BattleEnvironment : MonoBehaviour
                 HasEnemyAt(ship, new GridPosition(pos.x, pos.y, pos.z + 1)),
                 HasEnemyAt(ship, new GridPosition(pos.x, pos.y, pos.z - 1))
                 );
+    }
+
+    public ResupplyState GetResupplyState(SpaceshipAgent ship)
+    {
+        GridPosition pos = ship.CurrentState;
+
+        return new ResupplyState(
+            pos,
+            HasAllyNeedingHelpAt(ship, new GridPosition(pos.x - 1, pos.y, pos.z)),
+            HasAllyNeedingHelpAt(ship, new GridPosition(pos.x + 1, pos.y, pos.z)),
+            HasAllyNeedingHelpAt(ship, new GridPosition(pos.x, pos.y, pos.z + 1)),
+            HasAllyNeedingHelpAt(ship, new GridPosition(pos.x, pos.y, pos.z - 1)),
+            HasAllyNeedingHelpAt(ship, new GridPosition(pos.x, pos.y + 1, pos.z)),
+            HasAllyNeedingHelpAt(ship, new GridPosition(pos.x, pos.y - 1, pos.z))
+           
+        );
+    }
+
+    private bool HasAllyNeedingHelpAt(SpaceshipAgent ship, GridPosition pos)
+    {
+        foreach (SpaceshipAgent other in allShips)
+        {
+            if (other == ship)
+                continue;
+
+            if (other.team != ship.team)
+                continue;
+
+            if (other.CurrentState.Equals(pos) && other.NeedsHelp())
+                return true;
+        }
+
+        return false;
     }
 
     public bool HasEnemyAt(SpaceshipAgent ship, GridPosition pos)
