@@ -119,33 +119,48 @@ public class BattleManager : MonoBehaviour
         Debug.Log(playerWon ? "Victory!" : "Defeat!");
     }
 
+    //private void InitializeBattleCamera()
+    //{
+        //if (battleCamera == null ||
+            //playerMothership == null ||
+            //enemyMothership == null)
+        //{
+            //return;
+        //}
+
+        //Vector3 direction =
+            //(enemyMothership.position - playerMothership.position).normalized;
+
+        //Vector3 cameraPosition =
+            //playerMothership.position
+            //- direction * 120f
+            //+ Vector3.up * 100f;
+
+        //battleCamera.transform.position = cameraPosition;
+
+        //Vector3 lookTarget =
+            //Vector3.Lerp(
+                //playerMothership.position,
+                //enemyMothership.position,
+                //0.5f
+            //);
+
+        //battleCamera.transform.LookAt(lookTarget);
+    //}
     private void InitializeBattleCamera()
     {
-        if (battleCamera == null ||
-            playerMothership == null ||
-            enemyMothership == null)
-        {
+        if (battleCamera == null || battleEnvironment == null)
             return;
-        }
 
-        Vector3 direction =
-            (enemyMothership.position - playerMothership.position).normalized;
+        GameManager gm = FindObjectOfType<GameManager>();
+        Vector3 center = gm.GetGridWorldCenter();
 
         Vector3 cameraPosition =
-            playerMothership.position
-            - direction * 120f
-            + Vector3.up * 100f;
+            center
+            + new Vector3(0f, 0f, 0f);
 
         battleCamera.transform.position = cameraPosition;
-
-        Vector3 lookTarget =
-            Vector3.Lerp(
-                playerMothership.position,
-                enemyMothership.position,
-                0.5f
-            );
-
-        battleCamera.transform.LookAt(lookTarget);
+        battleCamera.transform.LookAt(center);
     }
 
     private void CreateStartingFleet()

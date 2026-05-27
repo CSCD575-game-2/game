@@ -528,6 +528,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Mothership
   maxHealth: 500
+  status: 0
   team: 0
 --- !u!114 &7267863022407217148
 MonoBehaviour:
