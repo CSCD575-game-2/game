@@ -29,39 +29,39 @@ public class KeyboardGridShipController : MonoBehaviour
 
     private void Update()
     {
-        HandleInput();
+        //HandleInput();
 
-        Vector3 direction = targetWorldPos - transform.position;
+        //Vector3 direction = targetWorldPos - transform.position;
 
-        // rotate toward movement direction
-        if (direction.sqrMagnitude > 0.001f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(direction.normalized);
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRotation,
-                10f * Time.deltaTime
-            );
+        //// rotate toward movement direction
+        //if (direction.sqrMagnitude > 0.001f)
+        //{
+            //Quaternion targetRotation = Quaternion.LookRotation(direction.normalized);
+            //transform.rotation = Quaternion.Slerp(
+                //transform.rotation,
+                //targetRotation,
+                //10f * Time.deltaTime
+            //);
 
-            float roll = Input.GetKey(KeyCode.H) ? 20f :
-            Input.GetKey(KeyCode.L) ? -20f : 0f;
+            //float roll = Input.GetKey(KeyCode.H) ? 20f :
+            //Input.GetKey(KeyCode.L) ? -20f : 0f;
 
-            Quaternion rollRot = Quaternion.Euler(0, 0, roll);
+            //Quaternion rollRot = Quaternion.Euler(0, 0, roll);
 
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRotation * rollRot,
-                5f * Time.deltaTime
-            );
+            //transform.rotation = Quaternion.Slerp(
+                //transform.rotation,
+                //targetRotation * rollRot,
+                //5f * Time.deltaTime
+            //);
 
-        }
+        //}
 
-        // move
-        transform.position = Vector3.MoveTowards(
-            transform.position,
-            targetWorldPos,
-            moveSpeed * Time.deltaTime
-        );
+        //// move
+        //transform.position = Vector3.MoveTowards(
+            //transform.position,
+            //targetWorldPos,
+            //moveSpeed * Time.deltaTime
+        //);
     }
 
     private void HandleInput()

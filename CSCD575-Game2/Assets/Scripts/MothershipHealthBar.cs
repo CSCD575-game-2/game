@@ -25,7 +25,7 @@ public class MothershipHealthBar : MonoBehaviour
             healthFillImage.fillAmount = ship.HealthPercent;
 
         if (targetCamera != null)
-            transform.forward = targetCamera.transform.forward;
+            healthFillImage.transform.forward = targetCamera.transform.forward;
     }
 }
 
