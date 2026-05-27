@@ -10,7 +10,8 @@ public class MainMenuUI : MonoBehaviour
     private Button newGame;
     private Button credits;
     private Button quit;
-    [SerializeField] private SceneLoader loader;
+    [SerializeField] private SceneLoader loader; // <-- this is so we can load into the main gameplay scene
+    [SerializeField] private MainMenuController controller; // <- this is so we can go to the credits scene
     // private UIDocument uiDoc;
     // private VisualElement root;
     private void OnEnable()
@@ -32,6 +33,9 @@ public class MainMenuUI : MonoBehaviour
     private void OnClickNewGame(ClickEvent clicked)
     {
         // Debug.Log("You pressed new game!");
+        OnCreditsDisable();
+        OnQuitDisable();
+        OnNewGameDisable();
         loader.LoadByName("Main");
     }
 
@@ -43,7 +47,8 @@ public class MainMenuUI : MonoBehaviour
 
     private void OnClickCredits(ClickEvent clicked)
     {
-        Debug.Log("You pressed credits!");
+        // Debug.Log("You pressed credits!");
+        controller.OpenCredits();
     }
 
     private void OnCreditsDisable()
