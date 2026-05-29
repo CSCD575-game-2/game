@@ -57,12 +57,15 @@ public class TDPolicy : IRLPolicy<ShipState>
         // explore
         if (Random.value < Epsilon)
         {
-            return actions[Random.Range(0, actions.Length)];
+            
+            int randomIndex = Random.Range(0, actions.Length);
+            //Debug.Log($"Chosen action (explore) {actions[randomIndex]} at index: {randomIndex}");
+            return actions[randomIndex];
         }
 
         // exploit
-        string bestAction = actions[Random.Range(0, actions.Length)];
         float bestValue = float.NegativeInfinity;
+        List<string> bestActions = new();
 
         foreach (string action in actions)
         {
@@ -71,9 +74,18 @@ public class TDPolicy : IRLPolicy<ShipState>
             if (q > bestValue)
             {
                 bestValue = q;
-                bestAction = action;
+                bestActions.Clear();
+                bestActions.Add(action);
+            }
+            else if (Mathf.Approximately(q, bestValue))
+            {
+                bestActions.Add(action);
             }
         }
+
+        string bestAction = bestActions[Random.Range(0, bestActions.Count)];
+
+        //Debug.Log($"Chosen action (exploit): {bestAction}, Q: {bestValue}");
 
         return bestAction;
     }

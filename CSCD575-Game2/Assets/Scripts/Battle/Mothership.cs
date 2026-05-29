@@ -17,10 +17,17 @@ public class Mothership : MonoBehaviour
         status = ShipStatus.Active;
     }
 
+    public void ResetHealth()
+    {
+        currentHealth = maxHealth;
+        status = ShipStatus.Active;
+        print($"{team} mothership health reset to {maxHealth}");
+    }
 
     public void TakeDamage(float amount)
     {
         currentHealth = Mathf.Clamp(currentHealth - amount, 0f, maxHealth);
+        print($"Mothership took {amount} damage" + $" (current health: {currentHealth}/{maxHealth})");
 
         if (currentHealth <= 0f)
         {

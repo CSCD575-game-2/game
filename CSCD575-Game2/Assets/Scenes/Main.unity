@@ -2611,6 +2611,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3230347030879953356, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
+      propertyPath: m_Name
+      value: BackgroundHealthEnemy
+      objectReference: {fileID: 0}
     - target: {fileID: 5816300221100155041, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
       propertyPath: m_LocalScale.x
       value: 2
@@ -2625,7 +2629,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5816300221100155041, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1000
+      value: 1051.6
       objectReference: {fileID: 0}
     - target: {fileID: 5816300221100155041, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2668,9 +2672,13 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 330585545}
     - target: {fileID: 6159357330671018884, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
-      propertyPath: healthFillImage
+      propertyPath: backgroundImage
       value: 
       objectReference: {fileID: 334571426}
+    - target: {fileID: 6159357330671018884, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
+      propertyPath: healthFillImage
+      value: 
+      objectReference: {fileID: 1371870053}
     - target: {fileID: 7416584044414341810, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
       propertyPath: m_Name
       value: F3_Yellow Enemy Mothership
@@ -2694,6 +2702,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5816300221100155041, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
   m_PrefabInstance: {fileID: 645630377}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &645630385 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6776847101568586406, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
+  m_PrefabInstance: {fileID: 645630377}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 645630378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e2dba6f08ca54cb5af6948a5b5271aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Mothership
 --- !u!1 &660473691
 GameObject:
   m_ObjectHideFlags: 0
@@ -5974,6 +5993,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.AspectRatioFitter
   m_AspectMode: 3
   m_AspectRatio: 1.7777
+--- !u!114 &1371870053 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1355707729259486426, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
+  m_PrefabInstance: {fileID: 645630377}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &1405184655
 GameObject:
   m_ObjectHideFlags: 0
@@ -7271,6 +7301,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleManager
   battleEnvironment: {fileID: 415944129}
+  levelSkyboxes:
+  - {fileID: 2100000, guid: 4fbf92cf634b10148b946a2378bfec52, type: 2}
+  - {fileID: 2100000, guid: bcd3417f7c4e30d40bdf0dc5002ae1fd, type: 2}
+  - {fileID: 2100000, guid: 0a98eaa61401f3c49a068e4fbd6c2e2a, type: 2}
+  - {fileID: 2100000, guid: 9e07b5f1ebeb2764ea80a163086f4ba7, type: 2}
+  - {fileID: 2100000, guid: 583f0d117f7056948943f87366c0f77b, type: 2}
   startButton: {fileID: 200111809}
   deployFighterButton: {fileID: 660473693}
   deployResupplyButton: {fileID: 1037782038}
@@ -7278,21 +7314,25 @@ MonoBehaviour:
   fighterPrefab: {fileID: 2964645160267510233}
   enemyFighterPrefab: {fileID: 1539822525}
   resupplyPrefab: {fileID: 65584467}
-  playerSpawnPoint: {fileID: 3102909751507431731}
+  playerSpawnPoint: {fileID: 0}
   spacing: 1.2
   startingFighters: 10
   startingResupplyShips: 5
-  startingEnemyFighters: 15
+  startingEnemyFighters: 2
   battleCamera: {fileID: 330585545}
   enemyDeployInterval: 2
   enemyStartingAggression: 0.2
   enemyAggressionIncreaseRate: 0.05
   playerMothershipPrefab: {fileID: 3102909751507431730}
   enemyMothershipPrefab: {fileID: 645630378}
+  playerMothership: {fileID: 3102909751507431733}
+  enemyMothership: {fileID: 645630385}
   exploreExploitSlider: {fileID: 1264500385}
   aggressionSlider: {fileID: 768497385}
   strategicSlider: {fileID: 1687748888}
   adaptiveSlider: {fileID: 1993491291}
+  currentLevel: 1
+  enemyFightersPerLevel: 1
 --- !u!4 &1670555059
 Transform:
   m_ObjectHideFlags: 0
@@ -7747,6 +7787,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1754831632}
   m_CullTransparentMesh: 1
+--- !u!114 &1758443803 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8968396832361083794, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
+  m_PrefabInstance: {fileID: 3102909751507431729}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &1760981877
 GameObject:
   m_ObjectHideFlags: 0
@@ -9495,15 +9546,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1000
+      value: 1220.1
       objectReference: {fileID: 0}
     - target: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
       propertyPath: m_LocalRotation.y
@@ -9515,7 +9566,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 180
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -9538,9 +9589,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 330585545}
     - target: {fileID: 7267863022407217148, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
-      propertyPath: healthFillImage
+      propertyPath: backgroundImage
       value: 
       objectReference: {fileID: 1723212280}
+    - target: {fileID: 7267863022407217148, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
+      propertyPath: healthFillImage
+      value: 
+      objectReference: {fileID: 1758443803}
+    - target: {fileID: 8346608161872228157, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
+      propertyPath: m_Name
+      value: BackgroundHealthPlayer
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -9556,6 +9615,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
   m_PrefabInstance: {fileID: 3102909751507431729}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3102909751507431733 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 773505521124960182, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
+  m_PrefabInstance: {fileID: 3102909751507431729}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3102909751507431730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e2dba6f08ca54cb5af6948a5b5271aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Mothership
 --- !u!1001 &7795365851942086406
 PrefabInstance:
   m_ObjectHideFlags: 0
