@@ -435,16 +435,28 @@ PrefabInstance:
       value: 11.5 Player Resupply
       objectReference: {fileID: 0}
     - target: {fileID: 5453409569225764919, guid: b84194ea03853054d8eb2ef411d8899e, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5453409569225764919, guid: b84194ea03853054d8eb2ef411d8899e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5453409569225764919, guid: b84194ea03853054d8eb2ef411d8899e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5453409569225764919, guid: b84194ea03853054d8eb2ef411d8899e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 466.0671
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 5453409569225764919, guid: b84194ea03853054d8eb2ef411d8899e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 291.95404
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 5453409569225764919, guid: b84194ea03853054d8eb2ef411d8899e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 431.88672
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 5453409569225764919, guid: b84194ea03853054d8eb2ef411d8899e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -528,3 +540,5 @@ MonoBehaviour:
   attackEffectTime: 0.08
   accelerationTime: 0.25
   maxMoveSpeed: 20
+  explosionPrefab: {fileID: 0}
+  destroyDelay: 0.4

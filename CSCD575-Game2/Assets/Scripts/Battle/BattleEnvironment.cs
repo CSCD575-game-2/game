@@ -292,6 +292,9 @@ public class BattleEnvironment : MonoBehaviour
         GridPosition nextState)
     {
         float reward = -0.1f;
+
+        if (HasAttackTargetAdjacent(ship, state))
+            reward -= 2f;
         
         Vector3 goalWorld = GetCommanderGoalWorldPosition(ship);
 
@@ -315,6 +318,28 @@ public class BattleEnvironment : MonoBehaviour
 
         return reward;
 
+    }
+
+    private bool HasAttackTargetAdjacent(SpaceshipAgent ship, GridPosition pos)
+    {
+        GridPosition[] neighbors =
+        {
+            new GridPosition(pos.x - 1, pos.y, pos.z),
+            new GridPosition(pos.x + 1, pos.y, pos.z),
+            new GridPosition(pos.x, pos.y, pos.z + 1),
+            new GridPosition(pos.x, pos.y, pos.z - 1)
+        };
+
+        foreach (GridPosition neighbor in neighbors)
+        {
+            if (GetShipAtPosition(neighbor, ship.team) != null)
+                return true;
+
+            if (GetEnemyMothershipAtPosition(ship, neighbor) != null)
+                return true;
+        }
+
+        return false;
     }
 
     private float GetResupplyMovementReward(
@@ -421,6 +446,8 @@ public class BattleEnvironment : MonoBehaviour
             "AttackRight" => new GridPosition(state.x + 1, state.y, state.z),
             "AttackForward" => new GridPosition(state.x, state.y, state.z + 1),
             "AttackBack" => new GridPosition(state.x, state.y, state.z - 1),
+            "AttackUp" => new GridPosition(state.x, state.y + 1, state.z),
+            "AttackDown" => new GridPosition(state.x, state.y - 1, state.z),
             _ => state
         };
     }
@@ -428,34 +455,41 @@ public class BattleEnvironment : MonoBehaviour
     public float ResolveAttack(SpaceshipAgent attacker, string action)
     {
         GridPosition targetPos = GetAttackTarget(attacker.CurrentState, action);
+        GridPosition attackerPos = attacker.CurrentState;
 
         if (!IsWithinBounds(targetPos))
             return -2f;
 
+
         SpaceshipAgent target = GetShipAtPosition(targetPos, attacker.team);
         Mothership mothership = GetEnemyMothershipAtPosition(attacker, targetPos);
-        Debug.Log($"Resolving attack: Attacker: {attacker.name}, Action: {action}, TargetPos: {targetPos}, Target: {(target != null ? target.name : "None")} Mothership: {(mothership != null ? mothership.name : "None")}");
+
+        if (target == null && mothership == null)
+            return -0.5f; // missed shot
+        
 
         attacker.PlayAttackEffect(GridToWorld(targetPos));
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayLaserShot();
         }
-        Debug.Log($"Attacker: {attacker.name}, Action: {action}, TargetPos: {targetPos}, Target: {(target != null ? target.name : "None")} Mothership: {(mothership != null ? mothership.name : "None")}");
 
-        if (target == null && mothership == null)
-            return -0.5f; // missed shot
+        Debug.Log($"Attacker: {attacker.name}-{attacker.ID} ({attacker.status}), at {attackerPos}" +
+                $", Action: {action}, TargetPos: {targetPos}" +
+                $", Target: {(target != null ? target.name + "-" + target.ID + "(" + target.status + ")": "None")}" +
+                $", Mothership: {(mothership != null ? mothership.name : "None")}");
+
 
         if (target != null)
         {
             target.TakeDamage(25f);
 
             if (target.status == ShipStatus.Destroyed && target.role == ShipRole.Fighter)
-                return 10f;
+                return 20f;
             if (target.status == ShipStatus.Destroyed && target.role == ShipRole.Mothership)
                 return 50f;
 
-            return 5f;
+            return 10f;
 
         } 
         else if (mothership != null)
@@ -593,6 +627,9 @@ public class BattleEnvironment : MonoBehaviour
                 continue;
 
             if (ship.team == attackerTeam)
+                continue;
+
+            if (ship.status == ShipStatus.Docked)
                 continue;
 
             if (ship.CurrentState.Equals(pos))
