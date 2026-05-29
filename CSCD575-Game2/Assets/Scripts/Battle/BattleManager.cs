@@ -61,6 +61,12 @@ public class BattleManager : MonoBehaviour
     private bool deployResupplyOnCooldown;
 
 
+    [SerializeField] private TextMeshProUGUI fleetStatusText;
+    [SerializeField] private TextMeshProUGUI enemyFleetStatusText;
+    [SerializeField] private TextMeshProUGUI gameOverStatusText;
+
+
+
     private float enemyDeployTimer;
 
     private BattlePhase phase = BattlePhase.Deployment;
@@ -69,6 +75,66 @@ public class BattleManager : MonoBehaviour
     {
         BeginLevel();
         InitializeBattleCamera();
+    }
+
+    private void UpdateFleetStatusText()
+    {
+        int fighterDocked = 0;
+        int fighterDestroyed = 0;
+        int fighterActive = 0;
+
+        int resupplyDocked = 0;
+        int resupplyDestroyed = 0;
+        int resupplyActive = 0;
+
+        int enemyFightersDocked = 0;
+        int enemyFightersDestroyed = 0;
+        int enemyFightersActive = 0;
+
+        foreach (SpaceshipAgent ship in battleEnvironment.allShips)
+        {
+            if (ship.team != ShipTeam.Player)
+                continue;
+            if (ship.role == ShipRole.Fighter)
+            {
+                if (ship.status == ShipStatus.Docked)
+                    fighterDocked++;
+                else if (ship.status == ShipStatus.Destroyed)
+                    fighterDestroyed++;
+                else
+                    fighterActive++;
+            }
+            else if (ship.role == ShipRole.Resupply)
+            {
+                if (ship.status == ShipStatus.Docked)
+                    resupplyDocked++;
+                else if (ship.status == ShipStatus.Destroyed)
+                    resupplyDestroyed++;
+                else
+                    resupplyActive++;
+            }
+        }
+        foreach (SpaceshipAgent ship in battleEnvironment.allShips)
+        {
+            if (ship.team != ShipTeam.Enemy)
+                continue;
+            if (ship.role == ShipRole.Fighter)
+            {
+                if (ship.status == ShipStatus.Docked)
+                    enemyFightersDocked++;
+                else if (ship.status == ShipStatus.Destroyed)
+                    enemyFightersDestroyed++;
+                else
+                    enemyFightersActive++;
+            }
+        }
+
+        fleetStatusText.text =
+            $"FIGHTERS\nACTIVE:{fighterActive}\nDEPLOYED:{fighterDocked}\nDESTROYED:{fighterDestroyed}\n\n" +
+            $"RESUPPLY\nACTIVE:{resupplyActive}\nDEPLOYED:{resupplyDocked}\nDESTROYED:{resupplyDestroyed}";
+
+        enemyFleetStatusText.text =
+            $"ENEMY FIGHTERS\nACTIVE:{enemyFightersActive}\nDEPLOYED:{enemyFightersDocked}\nDESTROYED:{enemyFightersDestroyed}";
     }
 
     private void UpdateLevelDisplay()
@@ -87,6 +153,7 @@ public class BattleManager : MonoBehaviour
     }
 
     private void BeginLevel() {
+
 
         UpdateLevelDisplay();
 
@@ -148,6 +215,8 @@ public class BattleManager : MonoBehaviour
         {
             GameOver(true);
         }
+
+        UpdateFleetStatusText();
     }
     private int GetEnemyFighterCount()
     {
@@ -173,6 +242,7 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
+            gameOverStatusText.text = "GAME OVER";
             currentLevel = 1;
             BeginLevel();
         }
@@ -450,6 +520,8 @@ public class BattleManager : MonoBehaviour
 
     public void StartEpisode()
     {
+        gameOverStatusText.text = "";
+
         phase = BattlePhase.ActiveBattle;
 
         //battleEnvironment.SetAttackGoal();
