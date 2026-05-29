@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class BattleEnvironment : MonoBehaviour
@@ -29,6 +30,11 @@ public class BattleEnvironment : MonoBehaviour
     public float enemyAggression = 0.1f;
 
 
+    [SerializeField] private LineRenderer resupplyLine;
+    [SerializeField] private float resupplyEffectTime = 0.25f;
+    private Coroutine resupplyEffectCoroutine;
+
+
     public void Initialize(int sizeX, int sizeY, int sizeZ, float tileSpacing)
     {
         this.sizeX = sizeX;
@@ -42,6 +48,29 @@ public class BattleEnvironment : MonoBehaviour
             sizeY - 1,
             sizeZ - 1
         );
+    }
+    public void PlayResupplyEffect(Vector3 supplierPos, Vector3 targetWorldPos)
+    {
+        if (resupplyEffectCoroutine != null)
+        {
+            StopCoroutine(resupplyEffectCoroutine);
+            resupplyLine.enabled = false;
+        }
+
+        resupplyEffectCoroutine =
+            StartCoroutine(ResupplyEffect(supplierPos, targetWorldPos));
+    }
+
+    private IEnumerator ResupplyEffect(Vector3 supplierPos, Vector3 targetWorldPos)
+    {
+        resupplyLine.enabled = true;
+        resupplyLine.SetPosition(0, supplierPos);
+        resupplyLine.SetPosition(1, targetWorldPos);
+
+        yield return new WaitForSeconds(resupplyEffectTime);
+
+        resupplyLine.enabled = false;
+        resupplyEffectCoroutine = null;
     }
 
     public int GetDockedFighterCount(ShipTeam team)
@@ -585,6 +614,8 @@ public class BattleEnvironment : MonoBehaviour
             return -1f;
 
         target.Refuel(25f);
+        target.Repair(25f);
+        PlayResupplyEffect(supplier.transform.position, target.transform.position);
 
         if (target.role == ShipRole.Fighter)
             return 8f;

@@ -211,12 +211,12 @@ public class SpaceshipAgent : MonoBehaviour
                 //break;
             //}
 
-            //if (stepsUsed > maxSteps)
-            //{
-                //status = ShipStatus.Destroyed;
-                //Debug.Log($"{role} destroyed: exceeded max steps");
-                //break;
-            //}
+            if (stepsUsed > maxSteps)
+            {
+                status = ShipStatus.Disabled;;
+                Debug.Log($"{role} disabled: exceeded max steps");
+                break;
+            }
 
             if (ShouldEndEpisode())
             {
@@ -267,6 +267,14 @@ public class SpaceshipAgent : MonoBehaviour
             resupplyPolicy.Learn(state, action, reward, nextResupplyState);
 
             stepsUsed++;
+
+            if (stepsUsed > maxSteps)
+            {
+                status = ShipStatus.Disabled;;
+                Debug.Log($"{role} disabled: exceeded max steps");
+                break;
+            }
+
 
             if (ShouldEndEpisode())
             {
@@ -426,11 +434,25 @@ public class SpaceshipAgent : MonoBehaviour
 
     public void Refuel(float amount)
     {
+        ShipStatus prevStatus = status;
         stepsUsed = Mathf.Max(0, stepsUsed - Mathf.RoundToInt(amount * maxSteps));
         if (stepsUsed > 0) {
             status = ShipStatus.Active;
         }
+        if (prevStatus == ShipStatus.Disabled && stepsUsed <= 0) {
+            Debug.Log($"{role} refueled and reactivated");
+            episodeCoroutine = StartCoroutine(RunEpisode());
+        }
     }
+    public void Repair(float amount)
+    {
+        currentHealth += amount * maxHealth;
+        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+        if (currentHealth > 0f) {
+            status = ShipStatus.Active;
+        }
+    }
+
     public void DockForNextLevel(
             BattleEnvironment battleEnv,
             GridPosition dockPosition)

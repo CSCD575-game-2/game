@@ -202,6 +202,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3512555309104794465, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: maxMoveSpeed
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 3512555309104794465, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
+      propertyPath: explosionPrefab
+      value: 
+      objectReference: {fileID: 7795365851942086407}
     - target: {fileID: 5181181404580091872, guid: 30cb3ff9fcede492fb37ead672725406, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1000
@@ -1338,17 +1346,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!114 &334571426 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6686996982607154590, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
-  m_PrefabInstance: {fileID: 645630377}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &368501573
 GameObject:
   m_ObjectHideFlags: 0
@@ -1869,6 +1866,8 @@ MonoBehaviour:
     z: 0
   playerAggression: 0.5
   enemyAggression: 0.1
+  resupplyLine: {fileID: 1128751051}
+  resupplyEffectTime: 3
 --- !u!4 &415944130
 Transform:
   m_ObjectHideFlags: 0
@@ -3019,22 +3018,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3230347030879953356, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
-      propertyPath: m_Name
-      value: BackgroundHealthEnemy
-      objectReference: {fileID: 0}
-    - target: {fileID: 5816300221100155041, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5816300221100155041, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5816300221100155041, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 5816300221100155041, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1051.6
@@ -3079,14 +3062,6 @@ PrefabInstance:
       propertyPath: targetCamera
       value: 
       objectReference: {fileID: 330585545}
-    - target: {fileID: 6159357330671018884, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
-      propertyPath: backgroundImage
-      value: 
-      objectReference: {fileID: 334571426}
-    - target: {fileID: 6159357330671018884, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
-      propertyPath: healthFillImage
-      value: 
-      objectReference: {fileID: 1371870053}
     - target: {fileID: 6776847101568586406, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
       propertyPath: finalMegaExplosionPrefab
       value: 
@@ -3098,10 +3073,6 @@ PrefabInstance:
     - target: {fileID: 7416584044414341810, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
       propertyPath: m_Name
       value: F3_Yellow Enemy Mothership
-      objectReference: {fileID: 0}
-    - target: {fileID: 9137849722285303406, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
-      propertyPath: m_RenderingLayerMask
-      value: 4294967295
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4993,6 +4964,148 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!1 &1128751050
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1128751052}
+  - component: {fileID: 1128751051}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!120 &1128751051
+LineRenderer:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128751050}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_Positions:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 1}
+  m_Parameters:
+    serializedVersion: 3
+    widthMultiplier: 1
+    widthCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 0, g: 0.4925073, b: 0.9245283, a: 1}
+      key1: {r: 0.4308473, g: 0.74884844, b: 0.8867924, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    numCornerVertices: 0
+    numCapVertices: 0
+    alignment: 0
+    textureMode: 0
+    textureScale: {x: 1, y: 1}
+    shadowBias: 0.5
+    generateLightingData: 0
+  m_UseWorldSpace: 1
+  m_Loop: 0
+  m_ApplyActiveColorSpace: 1
+--- !u!4 &1128751052
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128751050}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1530.3833, y: 634.79517, z: 139.5181}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1159090649
 GameObject:
   m_ObjectHideFlags: 0
@@ -5022,10 +5135,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec5d42f51ca9444d5820b2476a0f3a70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShipSelectionManager
-  mainCamera: {fileID: 330585545}
-  selectableMask:
-    serializedVersion: 2
-    m_Bits: 8
 --- !u!4 &1159090651
 Transform:
   m_ObjectHideFlags: 0
@@ -6495,17 +6604,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.AspectRatioFitter
   m_AspectMode: 3
   m_AspectRatio: 1.7777
---- !u!114 &1371870053 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1355707729259486426, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
-  m_PrefabInstance: {fileID: 645630377}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &1405184655
 GameObject:
   m_ObjectHideFlags: 0
@@ -6860,6 +6958,10 @@ PrefabInstance:
       propertyPath: targetCamera
       value: 
       objectReference: {fileID: 330585545}
+    - target: {fileID: 5594545063816505545, guid: ca607127f9c16430a986cfff416d2664, type: 3}
+      propertyPath: maxSteps
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 5594545063816505545, guid: ca607127f9c16430a986cfff416d2664, type: 3}
       propertyPath: explosionPrefab
       value: 
@@ -7365,7 +7467,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0.00012207031, y: 0}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 400, y: 50}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &1603381011
 MonoBehaviour:
@@ -8087,9 +8189,17 @@ MonoBehaviour:
   deployFighterButton: {fileID: 660473693}
   deployResupplyButton: {fileID: 1037782038}
   endBattleButton: {fileID: 858801389}
+  fleetStatusText: {fileID: 433796066}
+  enemyFleetStatusText: {fileID: 1603381011}
+  gameOverStatusText: {fileID: 1588502667}
+  levelText: {fileID: 398668571}
+  deployFighterCooldownFill: {fileID: 1742705154}
+  deployResupplyCooldownFill: {fileID: 1233615948}
   fighterPrefab: {fileID: 2964645160267510233}
   enemyFighterPrefab: {fileID: 1539822525}
   resupplyPrefab: {fileID: 65584467}
+  playerMothershipPrefab: {fileID: 3102909751507431730}
+  enemyMothershipPrefab: {fileID: 645630378}
   playerSpawnPoint: {fileID: 0}
   spacing: 1.2
   startingFighters: 12
@@ -8097,10 +8207,10 @@ MonoBehaviour:
   startingEnemyFighters: 4
   battleCamera: {fileID: 330585545}
   enemyDeployInterval: 2
+  deployFighterCooldown: 1
+  deployResupplyCooldown: 5
   enemyStartingAggression: 0.2
-  enemyAggressionIncreaseRate: 0.05
-  playerMothershipPrefab: {fileID: 3102909751507431730}
-  enemyMothershipPrefab: {fileID: 645630378}
+  enemyAggressionIncreaseRate: 0.02
   playerMothership: {fileID: 3102909751507431733}
   enemyMothership: {fileID: 645630385}
   exploreExploitSlider: {fileID: 1264500385}
@@ -8108,15 +8218,7 @@ MonoBehaviour:
   strategicSlider: {fileID: 1687748888}
   adaptiveSlider: {fileID: 1993491291}
   currentLevel: 1
-  enemyFightersPerLevel: 1
-  levelText: {fileID: 398668571}
-  deployFighterCooldownFill: {fileID: 1742705154}
-  deployFighterCooldown: 1
-  deployResupplyCooldownFill: {fileID: 1233615948}
-  deployResupplyCooldown: 5
-  fleetStatusText: {fileID: 433796066}
-  enemyFleetStatusText: {fileID: 1603381011}
-  gameOverStatusText: {fileID: 1588502667}
+  enemyFightersPerLevel: 3
 --- !u!4 &1670555059
 Transform:
   m_ObjectHideFlags: 0
@@ -8243,17 +8345,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &1723212280 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8362510068631949865, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
-  m_PrefabInstance: {fileID: 3102909751507431729}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &1738043572
 GameObject:
   m_ObjectHideFlags: 0
@@ -8646,17 +8737,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1754831632}
   m_CullTransparentMesh: 1
---- !u!114 &1758443803 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8968396832361083794, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
-  m_PrefabInstance: {fileID: 3102909751507431729}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &1760981877
 GameObject:
   m_ObjectHideFlags: 0
@@ -10287,10 +10367,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 839824087226111875, guid: 5ade57234b985438684ca66e556c8707, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].time
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2776317016804905503, guid: 5ade57234b985438684ca66e556c8707, type: 3}
       propertyPath: targetCamera
       value: 
@@ -10340,13 +10416,13 @@ PrefabInstance:
       value: 1.1 PlayerFighter
       objectReference: {fileID: 0}
     - target: {fileID: 7073077719662260131, guid: 5ade57234b985438684ca66e556c8707, type: 3}
+      propertyPath: maxSteps
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7073077719662260131, guid: 5ade57234b985438684ca66e556c8707, type: 3}
       propertyPath: explosionPrefab
       value: 
       objectReference: {fileID: 7795365851942086407}
-    - target: {fileID: 7073077719662260131, guid: 5ade57234b985438684ca66e556c8707, type: 3}
-      propertyPath: attackEffectTime
-      value: 0.15
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10379,29 +10455,9 @@ PrefabInstance:
       propertyPath: mothershipExplosionPrefab
       value: 
       objectReference: {fileID: 7795365851942086407}
-    - target: {fileID: 841905761058305837, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
-      propertyPath: m_RenderingLayerMask
-      value: 4294967295
-      objectReference: {fileID: 0}
-    - target: {fileID: 904103648992171809, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1410711731888325617, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
       propertyPath: m_Name
       value: F3_Red Player Mothership
-      objectReference: {fileID: 0}
-    - target: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
       propertyPath: m_LocalPosition.x
@@ -10448,25 +10504,9 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 330585545}
     - target: {fileID: 7267863022407217148, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7267863022407217148, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
       propertyPath: targetCamera
       value: 
       objectReference: {fileID: 330585545}
-    - target: {fileID: 7267863022407217148, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
-      propertyPath: backgroundImage
-      value: 
-      objectReference: {fileID: 1723212280}
-    - target: {fileID: 7267863022407217148, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
-      propertyPath: healthFillImage
-      value: 
-      objectReference: {fileID: 1758443803}
-    - target: {fileID: 8346608161872228157, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
-      propertyPath: m_Name
-      value: BackgroundHealthPlayer
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10579,3 +10619,4 @@ SceneRoots:
   - {fileID: 65584465}
   - {fileID: 7795365851942086406}
   - {fileID: 571460813}
+  - {fileID: 1128751052}
