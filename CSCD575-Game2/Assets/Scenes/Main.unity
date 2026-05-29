@@ -516,6 +516,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 102584552}
   m_CullTransparentMesh: 1
+--- !u!108 &106950636 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 3926831874865375173, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+  m_PrefabInstance: {fileID: 7795365851942086406}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &122564219
 GameObject:
   m_ObjectHideFlags: 0
@@ -2644,6 +2649,135 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.36862746}
   m_EffectDistance: {x: 0, y: -3}
   m_UseGraphicAlpha: 1
+--- !u!1001 &571460813
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 62170197451293354, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: m_Name
+      value: ExplosionMothership
+      objectReference: {fileID: 0}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: playOnAwake
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: ShapeModule.type
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: LightsModule.light
+      value: 
+      objectReference: {fileID: 106950636}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: InitialModule.size3D
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: LightsModule.enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: ShapeModule.radius.value
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: ShapeModule.radiusThickness
+      value: 1.0000
+      objectReference: {fileID: 0}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 800
+      objectReference: {fileID: 0}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: LightsModule.rangeCurve.scalar
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: InitialModule.startSpeed.scalar
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: EmissionModule.rateOverTime.scalar
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: LightsModule.intensityCurve.scalar
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.b
+      value: 0.4523407
+      objectReference: {fileID: 0}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.81142515
+      objectReference: {fileID: 0}
+    - target: {fileID: 376428743055631341, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.r
+      value: 0.8962264
+      objectReference: {fileID: 0}
+    - target: {fileID: 514230529192338217, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1124706661378296733, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1124706661378296733, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1124706661378296733, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1124706661378296733, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1124706661378296733, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1124706661378296733, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1124706661378296733, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1124706661378296733, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1124706661378296733, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1124706661378296733, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3926831874865375173, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: m_Range
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 8404121398888624280, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
 --- !u!1 &601918990
 GameObject:
   m_ObjectHideFlags: 0
@@ -2953,6 +3087,14 @@ PrefabInstance:
       propertyPath: healthFillImage
       value: 
       objectReference: {fileID: 1371870053}
+    - target: {fileID: 6776847101568586406, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
+      propertyPath: finalMegaExplosionPrefab
+      value: 
+      objectReference: {fileID: 873163619}
+    - target: {fileID: 6776847101568586406, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
+      propertyPath: mothershipExplosionPrefab
+      value: 
+      objectReference: {fileID: 7795365851942086407}
     - target: {fileID: 7416584044414341810, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
       propertyPath: m_Name
       value: F3_Yellow Enemy Mothership
@@ -3749,6 +3891,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 858801387}
   m_CullTransparentMesh: 1
+--- !u!1 &873163619 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 62170197451293354, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
+  m_PrefabInstance: {fileID: 571460813}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &935544154
 GameObject:
   m_ObjectHideFlags: 0
@@ -6679,9 +6826,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e05e6d7e931945efbe34c0e756c57a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  sizeX: 4
-  sizeY: 2
-  sizeZ: 4
+  sizeX: 5
+  sizeY: 3
+  sizeZ: 5
   tileSpacing: 100
   tilePrefab: {fileID: 4994768076444227659, guid: 6057de322d60a45daaf60997bc20696f, type: 3}
   instantiateTiles: 0
@@ -7080,7 +7227,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000061035156, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1588502667
@@ -10224,6 +10371,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 773505521124960182, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
+      propertyPath: finalMegaExplosionPrefab
+      value: 
+      objectReference: {fileID: 873163619}
+    - target: {fileID: 773505521124960182, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
+      propertyPath: mothershipExplosionPrefab
+      value: 
+      objectReference: {fileID: 7795365851942086407}
     - target: {fileID: 841905761058305837, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
       propertyPath: m_RenderingLayerMask
       value: 4294967295
@@ -10350,10 +10505,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Explosion
       objectReference: {fileID: 0}
-    - target: {fileID: 514230529192338217, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1124706661378296733, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -10394,14 +10545,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3926831874865375173, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
-      propertyPath: m_Range
-      value: 1000
-      objectReference: {fileID: 0}
-    - target: {fileID: 8404121398888624280, guid: 748bc5049397942e5881847c65a6c7c5, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10435,3 +10578,4 @@ SceneRoots:
   - {fileID: 1659734883}
   - {fileID: 65584465}
   - {fileID: 7795365851942086406}
+  - {fileID: 571460813}

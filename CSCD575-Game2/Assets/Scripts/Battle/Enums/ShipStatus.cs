@@ -4,5 +4,6 @@ public enum ShipStatus
     ReturningHome,
     Docked,
     Destroyed,
-    Disabled
+    Disabled,
+    Dying
 }

@@ -128,13 +128,22 @@ public class BattleManager : MonoBehaviour
                     enemyFightersActive++;
             }
         }
+        if (fighterActive == 0 && fighterDocked == 0
+            && resupplyActive == 0 && resupplyDocked == 0)
+        {
+            GameOver(false);
+        }
+        if (enemyFightersActive == 0 && enemyFightersDocked == 0)
+        {
+            GameOver(true);
+        }
 
         fleetStatusText.text =
-            $"FIGHTERS\nACTIVE:{fighterActive}\nDEPLOYED:{fighterDocked}\nDESTROYED:{fighterDestroyed}\n\n" +
-            $"RESUPPLY\nACTIVE:{resupplyActive}\nDEPLOYED:{resupplyDocked}\nDESTROYED:{resupplyDestroyed}";
+            $"FIGHTERS\nACTIVE:  {fighterActive}\nDOCKED:  {fighterDocked}\nDESTROYED:  {fighterDestroyed}\n\n" +
+            $"RESUPPLY\nACTIVE:  {resupplyActive}\nDOCKED:  {resupplyDocked}\nDESTROYED:  {resupplyDestroyed}";
 
         enemyFleetStatusText.text =
-            $"ENEMY FIGHTERS\nACTIVE:{enemyFightersActive}\nDEPLOYED:{enemyFightersDocked}\nDESTROYED:{enemyFightersDestroyed}";
+            $"ENEMY FIGHTERS\nACTIVE:  {enemyFightersActive}\nDOCKED:  {enemyFightersDocked}\nDESTROYED:  {enemyFightersDestroyed}";
     }
 
     private void UpdateLevelDisplay()
@@ -204,6 +213,7 @@ public class BattleManager : MonoBehaviour
                 Debug.Log("Enemy aggression: " + battleEnvironment.enemyAggression);
             }
         }
+        
         if (battleEnvironment.playerMothership != null &&
                 battleEnvironment.playerMothership.IsDestroyed)
         {
@@ -225,6 +235,8 @@ public class BattleManager : MonoBehaviour
 
     private void GameOver(bool playerWon)
     {
+        if (phase == BattlePhase.Finished)
+            return;
         phase = BattlePhase.Finished;
 
         startButton.interactable = true;
@@ -236,15 +248,14 @@ public class BattleManager : MonoBehaviour
 
         if (playerWon)
         {
+            gameOverStatusText.text = "VICTORY";
             currentLevel++;
             enemyDeployInterval = Mathf.Max(0.5f, enemyDeployInterval - 0.5f); // Increase difficulty by deploying enemies more frequently
-            BeginLevel();
         }
         else
         {
             gameOverStatusText.text = "GAME OVER";
             currentLevel = 1;
-            BeginLevel();
         }
         
     }
@@ -295,7 +306,9 @@ public class BattleManager : MonoBehaviour
 
     private void CreateStartingFleet()
     {
-        for (int i = 0; i < startingFighters; i++)
+        int numDockedFighters = battleEnvironment.GetDockedFighterCount(ShipTeam.Player);
+        int numDockedResupply = battleEnvironment.GetDockedResupplyShipCount();
+        for (int i = numDockedFighters; i < startingFighters; i++)
         {
             SpaceshipAgent ship = Instantiate(
                 fighterPrefab,
@@ -313,7 +326,7 @@ public class BattleManager : MonoBehaviour
             battleEnvironment.RegisterShip(ship);
         }
 
-        for (int i = 0; i < startingResupplyShips; i++)
+        for (int i = numDockedResupply; i < startingResupplyShips; i++)
         {
             SpaceshipAgent ship = Instantiate(
                 resupplyPrefab,
@@ -332,29 +345,11 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    private void ClearFleets() {
-        foreach (SpaceshipAgent ship in battleEnvironment.allShips)
-        {
-            Destroy(ship.gameObject);
-        }
-        battleEnvironment.allShips.Clear();
 
-
-        //if (battleEnvironment.playerMothership != null)
-        //{
-            //Destroy(battleEnvironment.playerMothership.gameObject);
-            //battleEnvironment.playerMothership = null;
-        //}
-        //if (battleEnvironment.enemyMothership != null)
-        //{
-            //Destroy(battleEnvironment.enemyMothership.gameObject);
-            //battleEnvironment.enemyMothership = null;
-        //}
-    }
 
     private void CreateFleets() {
         // first delete any existing enemy fighters from previous levels
-        ClearFleets();
+        battleEnvironment.ResetEnvironment();
 
         CreateStartingFleet();
         CreateEnemyFleet();
@@ -363,7 +358,8 @@ public class BattleManager : MonoBehaviour
 
     private void CreateEnemyFleet()
     {
-        for (int i = 0; i < GetEnemyFighterCount(); i++)
+        int numDockedEnemyFighters = battleEnvironment.GetDockedFighterCount(ShipTeam.Enemy);
+        for (int i = numDockedEnemyFighters; i < GetEnemyFighterCount(); i++)
         {
             SpaceshipAgent ship = Instantiate(
                 enemyFighterPrefab,
@@ -520,6 +516,7 @@ public class BattleManager : MonoBehaviour
 
     public void StartEpisode()
     {
+        BeginLevel();
         gameOverStatusText.text = "";
 
         phase = BattlePhase.ActiveBattle;
