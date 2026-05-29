@@ -55,6 +55,8 @@ public class SpaceshipAgent : MonoBehaviour
     [SerializeField] private GameObject explosionPrefab;
     [SerializeField] private float destroyDelay = 0.4f;
 
+    private Coroutine episodeCoroutine;
+
     public void PlayAttackEffect(Vector3 targetWorldPos)
     {
         StartCoroutine(AttackEffect(targetWorldPos));
@@ -87,7 +89,7 @@ public class SpaceshipAgent : MonoBehaviour
         currentState = startState;
         transform.position = env.GridToWorld(currentState);
 
-        StartCoroutine(RunEpisode());
+        episodeCoroutine = StartCoroutine(RunEpisode());
     }
 
     public void InitializeFighter(
@@ -429,5 +431,21 @@ public class SpaceshipAgent : MonoBehaviour
             status = ShipStatus.Active;
         }
     }
+    public void DockForNextLevel(
+            BattleEnvironment battleEnv,
+            GridPosition dockPosition)
+    {
+        if (attackLine != null)
+            attackLine.enabled = false;
+        StopAllCoroutines();
 
+        env = battleEnv;
+        moveVelocity = Vector3.zero;
+
+        currentState = dockPosition;
+        transform.position = battleEnv.GridToWorld(dockPosition);
+
+        status = ShipStatus.Docked;
+        gameObject.SetActive(false);
+    }
 }

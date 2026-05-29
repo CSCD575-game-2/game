@@ -44,6 +44,75 @@ public class BattleEnvironment : MonoBehaviour
         );
     }
 
+    public int GetDockedFighterCount(ShipTeam team)
+    {
+        if (team == ShipTeam.Player)
+            return dockedFighters.Count;
+        else
+            return dockedEnemyFighters.Count;
+    }
+    public int GetDockedResupplyShipCount()
+    {
+        return dockedResupplyShips.Count;
+    }
+
+    public void ResetEnvironment()
+    {
+        for (int i = allShips.Count - 1; i >= 0; i--)
+        {
+            SpaceshipAgent ship = allShips[i];
+            if (ship != null && ship.status == ShipStatus.Destroyed || ship.status == ShipStatus.Disabled)
+            {
+                Destroy(ship.gameObject);
+                allShips.RemoveAt(i);
+            }
+            else {
+                DockShip(ship);
+            }
+        }
+    }
+
+    public void DockShip(SpaceshipAgent ship) {
+        if (ship == null)
+            return;
+
+        GridPosition dockPos =
+            ship.team == ShipTeam.Player
+                ? playerMothershipPosition
+                : enemyMothershipPosition;
+
+        ship.DockForNextLevel(this, dockPos); 
+
+        ship.status = ShipStatus.Docked;
+        if (ship.role == ShipRole.Fighter &&
+            ship.team == ShipTeam.Player &&
+            !dockedFighters.Contains(ship))
+        {
+            dockedFighters.Add(ship);
+        }
+        if (ship.role == ShipRole.Fighter &&
+            ship.team == ShipTeam.Enemy &&
+            !dockedEnemyFighters.Contains(ship))
+        {
+            dockedEnemyFighters.Add(ship);
+        }
+        if (ship.role == ShipRole.Resupply &&
+            ship.team == ShipTeam.Player &&
+            !dockedResupplyShips.Contains(ship))
+        {
+            dockedResupplyShips.Add(ship);
+        }
+
+        ship.transform.position = GridToWorld(
+                ship.team == ShipTeam.Player
+                    ? playerMothershipPosition
+                    : enemyMothershipPosition
+                );
+        ship.currentState = ship.team == ShipTeam.Player
+            ? playerMothershipPosition
+            : enemyMothershipPosition;
+    }
+
     public void SetPlayerAggression(float value)
     {
         playerAggression = Mathf.Clamp01(value);
@@ -174,25 +243,6 @@ public class BattleEnvironment : MonoBehaviour
         return ship;
     }
 
-    public void DockShip(SpaceshipAgent ship)
-    {
-        ship.status = ShipStatus.Docked;
-
-        if (ship.role == ShipRole.Fighter &&
-            ship.team == ShipTeam.Player &&
-            !dockedFighters.Contains(ship))
-        {
-            dockedFighters.Add(ship);
-        }
-
-        if (ship.role == ShipRole.Fighter &&
-            ship.team == ShipTeam.Enemy &&
-            !dockedEnemyFighters.Contains(ship))
-        {
-            dockedEnemyFighters.Add(ship);
-        }
-
-    }
 
     public Vector3 GridToWorld(GridPosition pos)
     {
