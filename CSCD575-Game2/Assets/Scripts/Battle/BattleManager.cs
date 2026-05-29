@@ -14,12 +14,19 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Button deployFighterButton;
     [SerializeField] private Button deployResupplyButton;
     [SerializeField] private Button endBattleButton;
+    [SerializeField] private TextMeshProUGUI fleetStatusText;
+    [SerializeField] private TextMeshProUGUI enemyFleetStatusText;
+    [SerializeField] private TextMeshProUGUI gameOverStatusText;
+    [SerializeField] private TMP_Text levelText;
+    [SerializeField] private Image deployFighterCooldownFill;
+    [SerializeField] private Image deployResupplyCooldownFill;
 
     [Header("Prefabs")]
     [SerializeField] private SpaceshipAgent fighterPrefab;
     [SerializeField] private SpaceshipAgent enemyFighterPrefab;
-
     [SerializeField] private SpaceshipAgent resupplyPrefab;
+    [SerializeField] private GameObject playerMothershipPrefab;
+    [SerializeField] private GameObject enemyMothershipPrefab;
 
     [Header("Spawn Settings")]
     [SerializeField] private Transform playerSpawnPoint;
@@ -29,14 +36,10 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private int startingEnemyFighters = 5;
     [SerializeField] private Camera battleCamera;
     [SerializeField] private float enemyDeployInterval = 5f;
-    //private Transform playerMothership;
-    //private Transform enemyMothership;
-
+    [SerializeField] private float deployFighterCooldown = 5f;
+    [SerializeField] private float deployResupplyCooldown = 5f;
     [SerializeField] private float enemyStartingAggression = 0.1f;
     [SerializeField] private float enemyAggressionIncreaseRate = 0.02f;
-
-    [SerializeField] private GameObject playerMothershipPrefab;
-    [SerializeField] private GameObject enemyMothershipPrefab;
 
     [SerializeField] private Mothership playerMothership;
     [SerializeField] private Mothership enemyMothership;
@@ -47,29 +50,16 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Slider strategicSlider;
     [SerializeField] private Slider adaptiveSlider;
 
+    [Header("Level Progression")]
     [SerializeField] private int currentLevel = 1;
-    //[SerializeField] private int baseEnemyFighters = 2;
     [SerializeField] private int enemyFightersPerLevel = 3;
 
-    [SerializeField] private TMP_Text levelText;
-
-    [SerializeField] private Image deployFighterCooldownFill;
-    [SerializeField] private float deployFighterCooldown = 5f;
-    private bool deployFighterOnCooldown;
-    [SerializeField] private Image deployResupplyCooldownFill;
-    [SerializeField] private float deployResupplyCooldown = 5f;
     private bool deployResupplyOnCooldown;
-
-
-    [SerializeField] private TextMeshProUGUI fleetStatusText;
-    [SerializeField] private TextMeshProUGUI enemyFleetStatusText;
-    [SerializeField] private TextMeshProUGUI gameOverStatusText;
-
-
-
+    private bool deployFighterOnCooldown;
     private float enemyDeployTimer;
-
     private BattlePhase phase = BattlePhase.Deployment;
+    //private Transform playerMothership;
+    //private Transform enemyMothership;
 
     private void Start()
     {
@@ -81,6 +71,7 @@ public class BattleManager : MonoBehaviour
     {
         int fighterDocked = 0;
         int fighterDestroyed = 0;
+        int fighterDisabled = 0;
         int fighterActive = 0;
 
         int resupplyDocked = 0;
@@ -89,6 +80,7 @@ public class BattleManager : MonoBehaviour
 
         int enemyFightersDocked = 0;
         int enemyFightersDestroyed = 0;
+        int enemyFightersDisabled = 0;
         int enemyFightersActive = 0;
 
         foreach (SpaceshipAgent ship in battleEnvironment.allShips)
@@ -101,6 +93,8 @@ public class BattleManager : MonoBehaviour
                     fighterDocked++;
                 else if (ship.status == ShipStatus.Destroyed)
                     fighterDestroyed++;
+                else if (ship.status == ShipStatus.Disabled)
+                    fighterDisabled++;
                 else
                     fighterActive++;
             }
@@ -124,6 +118,8 @@ public class BattleManager : MonoBehaviour
                     enemyFightersDocked++;
                 else if (ship.status == ShipStatus.Destroyed)
                     enemyFightersDestroyed++;
+                else if (ship.status == ShipStatus.Disabled)
+                    enemyFightersDisabled++;
                 else
                     enemyFightersActive++;
             }
@@ -139,11 +135,16 @@ public class BattleManager : MonoBehaviour
         }
 
         fleetStatusText.text =
-            $"FIGHTERS\nACTIVE:  {fighterActive}\nDOCKED:  {fighterDocked}\nDESTROYED:  {fighterDestroyed}\n\n" +
-            $"RESUPPLY\nACTIVE:  {resupplyActive}\nDOCKED:  {resupplyDocked}\nDESTROYED:  {resupplyDestroyed}";
+            $"PLAYER FIGHTERS\n\n{fighterDocked}  DOCKED\n{fighterActive}  ACTIVE" +
+            $"\n{fighterDisabled}  DISABLED" +
+            $"\n{fighterDestroyed}  DESTROYED\n\n" +
+            $"RESUPPLY\n\n{resupplyActive}  ACTIVE\n{resupplyDocked}  DOCKED" + 
+            $"\n{resupplyDestroyed}  DESTROYED";
 
         enemyFleetStatusText.text =
-            $"ENEMY FIGHTERS\nACTIVE:  {enemyFightersActive}\nDOCKED:  {enemyFightersDocked}\nDESTROYED:  {enemyFightersDestroyed}";
+            $"ENEMY FIGHTERS\n\nDOCKED  {enemyFightersDocked}\nACTIVE  {enemyFightersActive}" + 
+            $"\nDISABLED  {enemyFightersDisabled}" +
+            $"\nDESTROYED  {enemyFightersDestroyed}";
     }
 
     private void UpdateLevelDisplay()
@@ -260,34 +261,7 @@ public class BattleManager : MonoBehaviour
         
     }
 
-    //private void InitializeBattleCamera()
-    //{
-        //if (battleCamera == null ||
-            //playerMothership == null ||
-            //enemyMothership == null)
-        //{
-            //return;
-        //}
 
-        //Vector3 direction =
-            //(enemyMothership.position - playerMothership.position).normalized;
-
-        //Vector3 cameraPosition =
-            //playerMothership.position
-            //- direction * 120f
-            //+ Vector3.up * 100f;
-
-        //battleCamera.transform.position = cameraPosition;
-
-        //Vector3 lookTarget =
-            //Vector3.Lerp(
-                //playerMothership.position,
-                //enemyMothership.position,
-                //0.5f
-            //);
-
-        //battleCamera.transform.LookAt(lookTarget);
-    //}
     private void InitializeBattleCamera()
     {
         if (battleCamera == null || battleEnvironment == null)
@@ -486,32 +460,7 @@ public class BattleManager : MonoBehaviour
                 battleEnvironment.enemyMothershipPosition
             );
 
-        //GameObject playerObj = Instantiate(
-            //playerMothershipPrefab,
-            //battleEnvironment.GridToWorld(
-                //battleEnvironment.playerMothershipPosition
-            //),
-            //Quaternion.identity
-        //);
 
-        //GameObject enemyObj = Instantiate(
-            //enemyMothershipPrefab,
-            //battleEnvironment.GridToWorld(
-                //battleEnvironment.enemyMothershipPosition
-            //),
-            //Quaternion.identity
-        //);
-
-        //Mothership playerMs = playerObj.GetComponent<Mothership>();
-        //playerMs.team = ShipTeam.Player;
-        //battleEnvironment.RegisterMothership(playerMs);
-
-        //Mothership enemyMs = enemyObj.GetComponent<Mothership>();
-        //enemyMs.team = ShipTeam.Enemy;
-        //battleEnvironment.RegisterMothership(enemyMs);
-
-        //playerMothership = playerObj.transform;
-        //enemyMothership = enemyObj.transform;
     }
 
     public void StartEpisode()

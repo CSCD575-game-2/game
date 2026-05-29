@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2327062228555837184}
   - component: {fileID: 6686996982607154590}
   m_Layer: 0
-  m_Name: BackgroundHealth
+  m_Name: BackgroundHealthEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -262,16 +262,28 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 5725319387583671511, guid: 4a44e7ddd5d26154cb1e23c0c3a2addb, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5725319387583671511, guid: 4a44e7ddd5d26154cb1e23c0c3a2addb, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5725319387583671511, guid: 4a44e7ddd5d26154cb1e23c0c3a2addb, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5725319387583671511, guid: 4a44e7ddd5d26154cb1e23c0c3a2addb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 690.5511
+      value: 1051.6
       objectReference: {fileID: 0}
     - target: {fileID: 5725319387583671511, guid: 4a44e7ddd5d26154cb1e23c0c3a2addb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.39455
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 5725319387583671511, guid: 4a44e7ddd5d26154cb1e23c0c3a2addb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 363.62625
+      value: 76
       objectReference: {fileID: 0}
     - target: {fileID: 5725319387583671511, guid: 4a44e7ddd5d26154cb1e23c0c3a2addb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -300,6 +312,10 @@ PrefabInstance:
     - target: {fileID: 5725319387583671511, guid: 4a44e7ddd5d26154cb1e23c0c3a2addb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6995185826536630808, guid: 4a44e7ddd5d26154cb1e23c0c3a2addb, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 8732253722681417412, guid: 4a44e7ddd5d26154cb1e23c0c3a2addb, type: 3}
       propertyPath: m_Name
@@ -341,7 +357,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e2dba6f08ca54cb5af6948a5b5271aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Mothership
-  maxHealth: 500
+  maxHealth: 700
+  mothershipExplosionPrefab: {fileID: 0}
+  destroyDelay: 2
+  finalMegaExplosionPrefab: {fileID: 0}
   status: 0
   team: 1
 --- !u!114 &6159357330671018884
@@ -358,4 +377,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MothershipHealthBar
   ship: {fileID: 6776847101568586406}
   healthFillImage: {fileID: 1355707729259486426}
+  backgroundImage: {fileID: 6686996982607154590}
   targetCamera: {fileID: 0}

@@ -525,14 +525,14 @@ MonoBehaviour:
     x: 0
     y: 0
     z: 0
-  maxHealth: 100
+  maxHealth: 200
   moveDuration: 0.5
   stepDelay: 0.01
   spacing: 1.2
   rotateSpeed: 8
   rotationOffsetEuler: {x: 0, y: 0, z: 0}
   attackLine: {fileID: 839824087226111875}
-  attackEffectTime: 0.08
+  attackEffectTime: 0.15
   accelerationTime: 0.1
   maxMoveSpeed: 80
   explosionPrefab: {fileID: 0}
