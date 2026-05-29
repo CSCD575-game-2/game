@@ -131,9 +131,11 @@ public class SpaceshipAgent : MonoBehaviour
 
     private void ExplodeAndDisappear()
     {
+        
         if (explosionPrefab != null)
         {
             Debug.Log("BOOOOM!");
+            
             Instantiate(
                     explosionPrefab,
                     transform.position,
@@ -148,6 +150,7 @@ public class SpaceshipAgent : MonoBehaviour
     {
         yield return new WaitForSeconds(destroyDelay);
         status = ShipStatus.Destroyed;
+
         gameObject.SetActive(false);
     }
 

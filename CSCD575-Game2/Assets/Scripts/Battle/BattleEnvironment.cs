@@ -16,8 +16,8 @@ public class BattleEnvironment : MonoBehaviour
     public GridPosition playerMothershipPosition;
     public GridPosition enemyMothershipPosition;
 
-    public Mothership playerMothership { get; private set; }
-    public Mothership enemyMothership { get; private set; }
+    public Mothership playerMothership { get; set; }
+    public Mothership enemyMothership { get; set; }
 
     //public GridPosition CurrentPlayerGoal { get; private set; }
     //public GridPosition CurrentEnemyGoal { get; private set; }
@@ -89,6 +89,14 @@ public class BattleEnvironment : MonoBehaviour
 
     }
 
+    public void SetMotherships(
+        Mothership player,
+        Mothership enemy)
+    {
+        playerMothership = player;
+        enemyMothership = enemy;
+    }
+
     public void RegisterMothership(Mothership mothership)
     {
         if (mothership.team == ShipTeam.Player)
@@ -99,6 +107,7 @@ public class BattleEnvironment : MonoBehaviour
 
     public void RegisterShip(SpaceshipAgent ship)
     {
+        Debug.Log($"Registering ship: {ship.name}-{ship.ID} ({ship.status}), Role: {ship.role}, Team: {ship.team}");
         if (!allShips.Contains(ship))
         {
             allShips.Add(ship);
@@ -327,7 +336,9 @@ public class BattleEnvironment : MonoBehaviour
             new GridPosition(pos.x - 1, pos.y, pos.z),
             new GridPosition(pos.x + 1, pos.y, pos.z),
             new GridPosition(pos.x, pos.y, pos.z + 1),
-            new GridPosition(pos.x, pos.y, pos.z - 1)
+            new GridPosition(pos.x, pos.y, pos.z - 1),
+            new GridPosition(pos.x, pos.y + 1, pos.z),
+            new GridPosition(pos.x, pos.y - 1, pos.z)
         };
 
         foreach (GridPosition neighbor in neighbors)
@@ -454,15 +465,23 @@ public class BattleEnvironment : MonoBehaviour
 
     public float ResolveAttack(SpaceshipAgent attacker, string action)
     {
+
         GridPosition targetPos = GetAttackTarget(attacker.CurrentState, action);
         GridPosition attackerPos = attacker.CurrentState;
+
 
         if (!IsWithinBounds(targetPos))
             return -2f;
 
-
         SpaceshipAgent target = GetShipAtPosition(targetPos, attacker.team);
         Mothership mothership = GetEnemyMothershipAtPosition(attacker, targetPos);
+
+        Debug.Log("Mothership at target: " + (mothership != null ? mothership.name : "None"));
+
+        if (mothership != null) {
+            Debug.Log($"*** Resolving attack for {attacker.name}-{attacker.ID} ({attacker.status}), at {attackerPos}, Action: {action}, TargetPos: {targetPos}");
+        }
+
 
         if (target == null && mothership == null)
             return -0.5f; // missed shot
@@ -474,13 +493,22 @@ public class BattleEnvironment : MonoBehaviour
             AudioManager.Instance.PlayLaserShot();
         }
 
-        Debug.Log($"Attacker: {attacker.name}-{attacker.ID} ({attacker.status}), at {attackerPos}" +
-                $", Action: {action}, TargetPos: {targetPos}" +
-                $", Target: {(target != null ? target.name + "-" + target.ID + "(" + target.status + ")": "None")}" +
-                $", Mothership: {(mothership != null ? mothership.name : "None")}");
+        //Debug.Log($"Attacker: {attacker.name}-{attacker.ID} ({attacker.status}), at {attackerPos}" +
+                //$", Action: {action}, TargetPos: {targetPos}" +
+                //$", Target: {(target != null ? target.name + "-" + target.ID + "(" + target.status + ")": "None")}" +
+                //$", Mothership: {(mothership != null ? mothership.name : "None")}");
 
 
-        if (target != null)
+        if (mothership != null)
+        {
+            mothership.TakeDamage(25f);
+
+            if (mothership.status == ShipStatus.Destroyed)
+                return 50f;
+
+            return 50f;
+        } 
+        else if (target != null)
         {
             target.TakeDamage(25f);
 
@@ -491,15 +519,6 @@ public class BattleEnvironment : MonoBehaviour
 
             return 10f;
 
-        } 
-        else if (mothership != null)
-        {
-            mothership.TakeDamage(25f);
-
-            if (mothership.status == ShipStatus.Destroyed)
-                return 50f;
-
-            return 50f;
         }
 
         return 3f;
@@ -603,16 +622,21 @@ public class BattleEnvironment : MonoBehaviour
             SpaceshipAgent attacker,
             GridPosition pos)
     {
-        Debug.Log("checking for mothership at position: " + pos + " player mothership position: " + playerMothershipPosition + " enemy mothership position: " + enemyMothershipPosition);
+        //Debug.Log($"*** Attacker: {attacker.name}-{attacker.ID} ({attacker.status}) attacking {pos}" +
+                //$", Player Mothership at {playerMothershipPosition} at ({playerMothershipPosition})" +
+                //$", Enemy Mothership at {enemyMothershipPosition} at ({enemyMothershipPosition})");
+
         if (attacker.team == ShipTeam.Player &&
                 pos.Equals(enemyMothershipPosition))
         {
+            Debug.Log("Returning enemy mothership");
             return enemyMothership;
         }
 
         if (attacker.team == ShipTeam.Enemy &&
                 pos.Equals(playerMothershipPosition))
         {
+            Debug.Log("Returning player mothership");
             return playerMothership;
         }
 

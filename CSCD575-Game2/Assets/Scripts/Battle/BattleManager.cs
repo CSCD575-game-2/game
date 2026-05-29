@@ -5,6 +5,7 @@ public class BattleManager : MonoBehaviour
 {
     [Header("Environment")]
     [SerializeField] private BattleEnvironment battleEnvironment;
+    [SerializeField] private Material[] levelSkyboxes;
 
     [Header("UI")]
     [SerializeField] private Button startButton;
@@ -26,8 +27,8 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private int startingEnemyFighters = 5;
     [SerializeField] private Camera battleCamera;
     [SerializeField] private float enemyDeployInterval = 5f;
-    private Transform playerMothership;
-    private Transform enemyMothership;
+    //private Transform playerMothership;
+    //private Transform enemyMothership;
 
     [SerializeField] private float enemyStartingAggression = 0.1f;
     [SerializeField] private float enemyAggressionIncreaseRate = 0.02f;
@@ -35,12 +36,18 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private GameObject playerMothershipPrefab;
     [SerializeField] private GameObject enemyMothershipPrefab;
 
+    [SerializeField] private Mothership playerMothership;
+    [SerializeField] private Mothership enemyMothership;
+
     [Header("Commander Dials")]
     [SerializeField] private Slider exploreExploitSlider;
     [SerializeField] private Slider aggressionSlider;
     [SerializeField] private Slider strategicSlider;
     [SerializeField] private Slider adaptiveSlider;
 
+    [SerializeField] private int currentLevel = 1;
+    //[SerializeField] private int baseEnemyFighters = 2;
+    [SerializeField] private int enemyFightersPerLevel = 2;
 
     private float enemyDeployTimer;
 
@@ -48,8 +55,25 @@ public class BattleManager : MonoBehaviour
 
     private void Start()
     {
-        CreateStartingFleet();
-        CreateEnemyFleet();
+        BeginLevel();
+        InitializeBattleCamera();
+    }
+
+    private void ApplySkyboxForLevel()
+    {
+        if (levelSkyboxes == null || levelSkyboxes.Length == 0)
+            return;
+
+        int index = (currentLevel - 1) % levelSkyboxes.Length;
+
+        RenderSettings.skybox = levelSkyboxes[index];
+    }
+
+    private void BeginLevel() {
+
+        ApplySkyboxForLevel();
+
+        CreateFleets();
 
         deployFighterButton.interactable = false;
         deployResupplyButton.interactable = false;
@@ -67,8 +91,8 @@ public class BattleManager : MonoBehaviour
 
         battleEnvironment.SetPlayerAggression(aggressionSlider.value);
 
-        SpawnMotherships();
     }
+
 
     private void Update()
     {
@@ -106,6 +130,10 @@ public class BattleManager : MonoBehaviour
             GameOver(true);
         }
     }
+    private int GetEnemyFighterCount()
+    {
+        return startingEnemyFighters + ((currentLevel - 1) * enemyFightersPerLevel);
+    }
 
     private void GameOver(bool playerWon)
     {
@@ -117,6 +145,18 @@ public class BattleManager : MonoBehaviour
         endBattleButton.interactable = false;
 
         Debug.Log(playerWon ? "Victory!" : "Defeat!");
+
+        if (playerWon)
+        {
+            currentLevel++;
+            BeginLevel();
+        }
+        else
+        {
+            currentLevel = 1;
+            BeginLevel();
+        }
+        
     }
 
     //private void InitializeBattleCamera()
@@ -202,9 +242,38 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    private void ClearFleets() {
+        foreach (SpaceshipAgent ship in battleEnvironment.allShips)
+        {
+            Destroy(ship.gameObject);
+        }
+        battleEnvironment.allShips.Clear();
+
+
+        //if (battleEnvironment.playerMothership != null)
+        //{
+            //Destroy(battleEnvironment.playerMothership.gameObject);
+            //battleEnvironment.playerMothership = null;
+        //}
+        //if (battleEnvironment.enemyMothership != null)
+        //{
+            //Destroy(battleEnvironment.enemyMothership.gameObject);
+            //battleEnvironment.enemyMothership = null;
+        //}
+    }
+
+    private void CreateFleets() {
+        // first delete any existing enemy fighters from previous levels
+        ClearFleets();
+
+        CreateStartingFleet();
+        CreateEnemyFleet();
+        SpawnMotherships();
+    }
+
     private void CreateEnemyFleet()
     {
-        for (int i = 0; i < startingEnemyFighters; i++)
+        for (int i = 0; i < GetEnemyFighterCount(); i++)
         {
             SpaceshipAgent ship = Instantiate(
                 enemyFighterPrefab,
@@ -310,33 +379,53 @@ public class BattleManager : MonoBehaviour
 
     private void SpawnMotherships()
     {
-        GameObject playerObj = Instantiate(
-            playerMothershipPrefab,
-            battleEnvironment.GridToWorld(
+
+        playerMothership.team = ShipTeam.Player;
+        enemyMothership.team = ShipTeam.Enemy;
+        
+        playerMothership.ResetHealth();
+        enemyMothership.ResetHealth();
+
+        playerMothership.status = ShipStatus.Active;
+        enemyMothership.status = ShipStatus.Active;
+
+        battleEnvironment.SetMotherships(
+                playerMothership,
+                enemyMothership
+                );
+        playerMothership.transform.position = battleEnvironment.GridToWorld(
                 battleEnvironment.playerMothershipPosition
-            ),
-            Quaternion.identity
-        );
-
-        GameObject enemyObj = Instantiate(
-            enemyMothershipPrefab,
-            battleEnvironment.GridToWorld(
+            );
+        enemyMothership.transform.position = battleEnvironment.GridToWorld(
                 battleEnvironment.enemyMothershipPosition
-            ),
-            Quaternion.identity
-        );
+            );
 
-        Mothership playerMs = playerObj.GetComponent<Mothership>();
-        playerMs.team = ShipTeam.Player;
-        battleEnvironment.RegisterMothership(playerMs);
+        //GameObject playerObj = Instantiate(
+            //playerMothershipPrefab,
+            //battleEnvironment.GridToWorld(
+                //battleEnvironment.playerMothershipPosition
+            //),
+            //Quaternion.identity
+        //);
 
-        Mothership enemyMs = enemyObj.GetComponent<Mothership>();
-        enemyMs.team = ShipTeam.Enemy;
-        battleEnvironment.RegisterMothership(enemyMs);
+        //GameObject enemyObj = Instantiate(
+            //enemyMothershipPrefab,
+            //battleEnvironment.GridToWorld(
+                //battleEnvironment.enemyMothershipPosition
+            //),
+            //Quaternion.identity
+        //);
 
-        playerMothership = playerObj.transform;
-        enemyMothership = enemyObj.transform;
-        InitializeBattleCamera();
+        //Mothership playerMs = playerObj.GetComponent<Mothership>();
+        //playerMs.team = ShipTeam.Player;
+        //battleEnvironment.RegisterMothership(playerMs);
+
+        //Mothership enemyMs = enemyObj.GetComponent<Mothership>();
+        //enemyMs.team = ShipTeam.Enemy;
+        //battleEnvironment.RegisterMothership(enemyMs);
+
+        //playerMothership = playerObj.transform;
+        //enemyMothership = enemyObj.transform;
     }
 
     public void StartEpisode()
