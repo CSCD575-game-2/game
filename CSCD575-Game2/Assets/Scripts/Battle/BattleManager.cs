@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+using System.Collections;
 
 public class BattleManager : MonoBehaviour
 {
@@ -47,7 +49,17 @@ public class BattleManager : MonoBehaviour
 
     [SerializeField] private int currentLevel = 1;
     //[SerializeField] private int baseEnemyFighters = 2;
-    [SerializeField] private int enemyFightersPerLevel = 2;
+    [SerializeField] private int enemyFightersPerLevel = 3;
+
+    [SerializeField] private TMP_Text levelText;
+
+    [SerializeField] private Image deployFighterCooldownFill;
+    [SerializeField] private float deployFighterCooldown = 5f;
+    private bool deployFighterOnCooldown;
+    [SerializeField] private Image deployResupplyCooldownFill;
+    [SerializeField] private float deployResupplyCooldown = 5f;
+    private bool deployResupplyOnCooldown;
+
 
     private float enemyDeployTimer;
 
@@ -57,6 +69,11 @@ public class BattleManager : MonoBehaviour
     {
         BeginLevel();
         InitializeBattleCamera();
+    }
+
+    private void UpdateLevelDisplay()
+    {
+        levelText.text = $"LEVEL {currentLevel}";
     }
 
     private void ApplySkyboxForLevel()
@@ -70,6 +87,8 @@ public class BattleManager : MonoBehaviour
     }
 
     private void BeginLevel() {
+
+        UpdateLevelDisplay();
 
         ApplySkyboxForLevel();
 
@@ -149,6 +168,7 @@ public class BattleManager : MonoBehaviour
         if (playerWon)
         {
             currentLevel++;
+            enemyDeployInterval = Mathf.Max(0.5f, enemyDeployInterval - 0.5f); // Increase difficulty by deploying enemies more frequently
             BeginLevel();
         }
         else
@@ -470,6 +490,10 @@ public class BattleManager : MonoBehaviour
 
     public void DeployFighter()
     {
+
+        if (deployFighterOnCooldown)
+            return;
+
         if (phase != BattlePhase.ActiveBattle)
             return;
 
@@ -501,6 +525,31 @@ public class BattleManager : MonoBehaviour
         );
 
         Debug.Log("Docked fighter deployed");
+
+        StartCoroutine(DeployFighterCooldown());
+    }
+
+    private IEnumerator DeployFighterCooldown()
+    {
+        deployFighterOnCooldown = true;
+        deployFighterButton.interactable = false;
+
+        float timer = 0f;
+
+        while (timer < deployFighterCooldown)
+        {
+            timer += Time.deltaTime;
+
+            float progress = timer / deployFighterCooldown;
+
+            deployFighterCooldownFill.fillAmount = 1f - progress;
+
+            yield return null;
+        }
+
+        deployFighterCooldownFill.fillAmount = 0f;
+        deployFighterButton.interactable = true;
+        deployFighterOnCooldown = false;
     }
 
     public void DeployResupply()
@@ -536,7 +585,31 @@ public class BattleManager : MonoBehaviour
         );
 
         Debug.Log("Docked resupply ship deployed");
+        StartCoroutine(DeployResupplyCooldown());
     }
+    private IEnumerator DeployResupplyCooldown()
+    {
+        deployResupplyOnCooldown = true;
+        deployResupplyButton.interactable = false;
+
+        float timer = 0f;
+
+        while (timer < deployResupplyCooldown)
+        {
+            timer += Time.deltaTime;
+
+            float progress = timer / deployResupplyCooldown;
+
+            deployResupplyCooldownFill.fillAmount = 1f - progress;
+
+            yield return null;
+        }
+
+        deployResupplyCooldownFill.fillAmount = 0f;
+        deployResupplyButton.interactable = true;
+        deployResupplyOnCooldown = false;
+    }
+
 
     private void UpdateAggression(float value)
     {
