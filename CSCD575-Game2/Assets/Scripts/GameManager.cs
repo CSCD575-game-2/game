@@ -82,7 +82,7 @@ public class GameManager : MonoBehaviour
                 (sizeY - 1) * tileSpacing * 0.5f,
                 (sizeZ - 1) * tileSpacing * 0.5f
                 );
-        Debug.Log($"Grid Center: {center}");
+        //Debug.Log($"Grid Center: {center}");
         return center;
     }
 }

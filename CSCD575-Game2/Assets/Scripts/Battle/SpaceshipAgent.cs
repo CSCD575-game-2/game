@@ -17,6 +17,9 @@ public class SpaceshipAgent : MonoBehaviour
 
     public ShipTeam team;
 
+    private int id;
+    public int ID => id;
+
     [SerializeField] private float lowFuelHelpThreshold = 0.3f;
 
     [SerializeField] private int maxSteps = 100;
@@ -71,6 +74,7 @@ public class SpaceshipAgent : MonoBehaviour
 
     private void Initialize(BattleEnvironment env, GridPosition startState)
     {
+        this.id = GetInstanceID();
         currentHealth = maxHealth;
         this.env = env; 
 
@@ -109,10 +113,10 @@ public class SpaceshipAgent : MonoBehaviour
     {
         currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+        Debug.Log($"{role} took {amount} damage, health now {currentHealth}/{maxHealth}");
 
         if (currentHealth <= 0f)
         {
-            status = ShipStatus.Destroyed;
             ExplodeAndDisappear();
 
             if (AudioManager.Instance != null)
@@ -120,7 +124,7 @@ public class SpaceshipAgent : MonoBehaviour
                 AudioManager.Instance.PlayExplosion();
             }
 
-            gameObject.SetActive(false);
+            //gameObject.SetActive(false);
         }
 
     }
@@ -143,6 +147,7 @@ public class SpaceshipAgent : MonoBehaviour
     private IEnumerator DisappearAfterExplosion()
     {
         yield return new WaitForSeconds(destroyDelay);
+        status = ShipStatus.Destroyed;
         gameObject.SetActive(false);
     }
 

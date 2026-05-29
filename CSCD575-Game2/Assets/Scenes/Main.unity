@@ -2613,15 +2613,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5816300221100155041, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
       propertyPath: m_LocalScale.x
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5816300221100155041, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
       propertyPath: m_LocalScale.y
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5816300221100155041, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
       propertyPath: m_LocalScale.z
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5816300221100155041, guid: 31897508783a04e3c80765b2afcc7ee1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -6294,9 +6294,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e05e6d7e931945efbe34c0e756c57a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  sizeX: 6
-  sizeY: 5
-  sizeZ: 6
+  sizeX: 3
+  sizeY: 1
+  sizeZ: 3
   tileSpacing: 100
   tilePrefab: {fileID: 4994768076444227659, guid: 6057de322d60a45daaf60997bc20696f, type: 3}
   instantiateTiles: 0
@@ -9377,6 +9377,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 839824087226111875, guid: 5ade57234b985438684ca66e556c8707, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].time
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2776317016804905503, guid: 5ade57234b985438684ca66e556c8707, type: 3}
       propertyPath: targetCamera
       value: 
@@ -9429,6 +9433,10 @@ PrefabInstance:
       propertyPath: explosionPrefab
       value: 
       objectReference: {fileID: 7795365851942086407}
+    - target: {fileID: 7073077719662260131, guid: 5ade57234b985438684ca66e556c8707, type: 3}
+      propertyPath: attackEffectTime
+      value: 0.15
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -9467,15 +9475,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
       propertyPath: m_LocalScale.x
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
       propertyPath: m_LocalScale.y
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
       propertyPath: m_LocalScale.z
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2722570012450157026, guid: 77596bd1b51244f3cb1a21ec50225985, type: 3}
       propertyPath: m_LocalPosition.x
