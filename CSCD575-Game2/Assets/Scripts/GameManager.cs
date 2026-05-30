@@ -74,4 +74,15 @@ public class GameManager : MonoBehaviour
 
         tile.Setup(color, label);
     }
+
+    public Vector3 GetGridWorldCenter()
+    {
+        Vector3 center = new Vector3(
+                (sizeX - 1) * tileSpacing * 0.5f,
+                (sizeY - 1) * tileSpacing * 0.5f,
+                (sizeZ - 1) * tileSpacing * 0.5f
+                );
+        //Debug.Log($"Grid Center: {center}");
+        return center;
+    }
 }

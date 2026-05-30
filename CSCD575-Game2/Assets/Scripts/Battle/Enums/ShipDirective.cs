@@ -5,5 +5,6 @@ public enum ShipDirective
     Diversion,
     Scout,
     Retreat,
-    ReturnHome
+    ReturnHome,
+    Resupply
 }

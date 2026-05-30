@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TDPolicy : IRLPolicy
+public class TDPolicy : IRLPolicy<ShipState>
 {
-    //private readonly Dictionary<(GridPosition, string), float> qValues = new();
     private readonly Dictionary<(ShipState, string), float> qValues = new();
 
     private string[] actions =
@@ -22,9 +21,6 @@ public class TDPolicy : IRLPolicy
         "AttackForward",
         "AttackBack"
     };
-
-    //private readonly float alpha;
-    //private readonly float gamma;
 
     public float Epsilon { get; set; }
     public float Alpha { get; set; }
@@ -56,18 +52,20 @@ public class TDPolicy : IRLPolicy
             };
         }
 
-        //GridPosition state = ship.CurrentState;
         ShipState state = env.GetShipState(ship);
 
         // explore
         if (Random.value < Epsilon)
         {
-            return actions[Random.Range(0, actions.Length)];
+            
+            int randomIndex = Random.Range(0, actions.Length);
+            //Debug.Log($"Chosen action (explore) {actions[randomIndex]} at index: {randomIndex}");
+            return actions[randomIndex];
         }
 
         // exploit
-        string bestAction = actions[Random.Range(0, actions.Length)];
         float bestValue = float.NegativeInfinity;
+        List<string> bestActions = new();
 
         foreach (string action in actions)
         {
@@ -76,9 +74,18 @@ public class TDPolicy : IRLPolicy
             if (q > bestValue)
             {
                 bestValue = q;
-                bestAction = action;
+                bestActions.Clear();
+                bestActions.Add(action);
+            }
+            else if (Mathf.Approximately(q, bestValue))
+            {
+                bestActions.Add(action);
             }
         }
+
+        string bestAction = bestActions[Random.Range(0, bestActions.Count)];
+
+        //Debug.Log($"Chosen action (exploit): {bestAction}, Q: {bestValue}");
 
         return bestAction;
     }
@@ -114,15 +121,4 @@ public class TDPolicy : IRLPolicy
     }
 
     
-    //private float GetQ(GridPosition state, string action)
-    //{
-        //var key = (state, action);
-
-        //if (!qValues.ContainsKey(key))
-        //{
-            //qValues[key] = 0f;
-        //}
-
-        //return qValues[key];
-    //}
 }

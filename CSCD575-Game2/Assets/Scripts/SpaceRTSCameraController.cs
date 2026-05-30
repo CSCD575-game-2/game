@@ -17,24 +17,84 @@ public class SpaceRTSCameraController : MonoBehaviour
     [SerializeField] private float maxDistance = 200f;
 
     private Vector3 focusPoint = Vector3.zero;
-
-private float currentDistance = 50f;
+    
+    [SerializeField] private float autoOrbitSpeed = 5f;
+    [SerializeField] private float idleDelay = 3f;
+    private float lastInputTime;
+    [SerializeField] private float orbitSpeed = 5f;
+    [SerializeField] private float orbitDistance = 35f;
+    [SerializeField] private float orbitHeight = 18f;
+    private float orbitAngle;
+    
+    private float currentDistance = 50f;
     private float yaw;
     private float pitch;
 
+
+    [Header("Environment Reference")]
+    [SerializeField] private BattleEnvironment env;
+    [SerializeField] private Transform playerMothership;
+    [SerializeField] private Transform enemyMothership;
+
+
+
     private void Start()
     {
-        Vector3 euler = transform.eulerAngles;
-        yaw = euler.y;
-        pitch = euler.x;
+        //Vector3 euler = transform.eulerAngles;
+        //yaw = euler.y;
+        //pitch = euler.x;
+
+        GameManager gm = FindObjectOfType<GameManager>();
+        int maxSize = Mathf.Max(gm.GetSizeX(), gm.GetSizeY(), gm.GetSizeZ());
+        orbitDistance = gm.GetSpacing() *  maxSize * 1.5f;
+        orbitHeight = orbitDistance * 0.5f;
     }
 
     private void Update()
     {
-        HandleMouseLook();
-        HandleMovement();
-        UpdateFocusPoint();
-        HandleZoom();
+        bool hasInput = 
+            Mathf.Abs(Input.GetAxis("Mouse X")) > 0.01f ||
+            Mathf.Abs(Input.GetAxis("Mouse Y")) > 0.01f ||
+            Mathf.Abs(Input.GetAxis("Mouse ScrollWheel")) > 0.01f;
+
+        if (hasInput)
+        {
+            lastInputTime = Time.time;
+            HandleMouseLook();
+            HandleMovement();
+            UpdateFocusPoint();
+            HandleZoom();
+        } else {
+            AutoOrbit();
+        }
+    }
+
+    private Vector3 GetBattleCenter()
+    {
+        GameManager gm = FindObjectOfType<GameManager>();
+        return gm.GetGridWorldCenter();
+        
+    }
+
+
+    private void AutoOrbit()
+    {
+        Vector3 center = GetBattleCenter();
+
+        orbitAngle += orbitSpeed * Time.deltaTime;
+
+        float radians = orbitAngle * Mathf.Deg2Rad;
+
+        Vector3 offset = new Vector3(
+                Mathf.Cos(radians) * orbitDistance,
+                orbitHeight,
+                Mathf.Sin(radians) * orbitDistance
+                );
+
+        transform.position = center + offset;
+
+
+        transform.LookAt(center);
     }
 
     private void HandleMouseLook()

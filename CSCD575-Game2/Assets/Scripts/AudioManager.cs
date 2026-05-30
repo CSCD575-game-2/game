@@ -35,6 +35,7 @@ public class AudioManager : MonoBehaviour
 
     void Start()
     {
+        musicSource.volume = 0.0f;
         PlayMusic();
     }
 

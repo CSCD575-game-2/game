@@ -1,12 +1,12 @@
 
-public interface IRLPolicy
+public interface IRLPolicy<T>
 {
     string ChooseAction(SpaceshipAgent ship, BattleEnvironment env);
 
     void Learn(
-        ShipState state,
+        T state,
         string action,
         float reward,
-        ShipState nextState
+        T nextState
     );
 }
