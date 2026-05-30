@@ -20,6 +20,9 @@ public class BattleEnvironment : MonoBehaviour
 
     public Mothership playerMothership { get; set; }
     public Mothership enemyMothership { get; set; }
+    
+
+    public  bool playerFighterPriority = true;
 
     //public GridPosition CurrentPlayerGoal { get; private set; }
     //public GridPosition CurrentEnemyGoal { get; private set; }
@@ -48,10 +51,51 @@ public class BattleEnvironment : MonoBehaviour
             "Boom goes the dynamite!",
             "Another one bites the dust!"
         };
+        private static readonly string[] fighterDistressLines =
+        {
+            "I'm hit!",
+            "I can't hold them off!",
+            "Mayday! Mayday!",
+            "I'm going down!",
+            "Tell my wife I love her!",
+            "This is it for me!"
+        };
+
+        private static readonly string[] fighterDefeatedLines =
+        {
+            "NOOOOOOOOOOOOO...",
+            "Guys I just want to say that I'm the one who clogged the toilet...",
+            "Tell my family I love them...",
+            "I can't go on...",
+            "Welp, this is awkward...",
+        };
+
+        private static readonly string[] fighterBoastLines =
+        {
+            "Is that all you've got?",
+            "Too easy!",
+            "Another toaster for the pile!",
+            "You'll have to do better than that!",
+            "My grandma hits harder than you!"
+        };
 
         public static string GetRandomFighterLine()
         {
             return fighterLines[Random.Range(0, fighterLines.Length)];
+        }
+        public static string GetRandomFighterDistressLine()
+        {
+            return fighterDistressLines[Random.Range(0, fighterDistressLines.Length)];
+        }
+
+        public static string GetRandomFighterDefeatedLine()
+        {
+            return fighterDefeatedLines[Random.Range(0, fighterDefeatedLines.Length)];
+        }
+
+        public static string GetRandomFighterBoastLine()
+        {
+            return fighterBoastLines[Random.Range(0, fighterBoastLines.Length)];
         }
     }
     private float nextRadioMessageTime = 0f;
@@ -583,55 +627,118 @@ public class BattleEnvironment : MonoBehaviour
         Debug.Log("Mothership at target: " + (mothership != null ? mothership.name : "None"));
 
         if (mothership != null) {
-            Debug.Log($"*** Resolving attack for {attacker.name}-{attacker.ID} ({attacker.status}), at {attackerPos}, Action: {action}, TargetPos: {targetPos}");
+            Debug.Log($"*** Resolving attack for {attacker.name}-{attacker.ID}" + 
+                    $"({attacker.status}), at {attackerPos}, Action: {action}, TargetPos: {targetPos}");
         }
-
 
         if (target == null && mothership == null)
             return -0.5f; // missed shot
-        
 
         attacker.PlayAttackEffect(GridToWorld(targetPos));
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayLaserShot();
         }
-
-        //Debug.Log($"Attacker: {attacker.name}-{attacker.ID} ({attacker.status}), at {attackerPos}" +
-                //$", Action: {action}, TargetPos: {targetPos}" +
-                //$", Target: {(target != null ? target.name + "-" + target.ID + "(" + target.status + ")": "None")}" +
-                //$", Mothership: {(mothership != null ? mothership.name : "None")}");
         
         float damage = 25f;
 
-        if (mothership != null)
+        if (attacker.team == ShipTeam.Player) 
         {
-            mothership.TakeDamage(damage);
+           if (playerFighterPriority)
+           {
+                if (target != null)
+                {
+                    target.TakeDamage(damage);
+                    TryAppendBattleStatus($"{attacker.Callsign}: {RadioChatter.GetRandomFighterLine()} Attacked {target.Callsign} for {damage}!"); 
+
+                    if (target.status == ShipStatus.Destroyed && target.role == ShipRole.Fighter)
+                        return 10f;
+
+                    return 5f;
+
+                }
+                if (mothership != null)
+                {
+                    if (mothership.currentHealth - damage <= 0)
+                    {
+                        for (int i = 0; i < allShips.Count; i++)
+                        {
+                            SpaceshipAgent ship = allShips[i];
+                            if (ship.team == ShipTeam.Enemy && ship.status != ShipStatus.Destroyed)
+                            {
+                                AppendBattleStatus($"{ship.Callsign}: {RadioChatter.GetRandomFighterBoastLine()}");
+                                //ship.TakeDamage(100f);
+                            }
+                        }
+                    }
+                    mothership.TakeDamage(damage);
+                    if (mothership.team == ShipTeam.Enemy)
+                        TryAppendBattleStatus($"{attacker.Callsign} attacked the Basestar for {damage}!");
+
+                    if (mothership.status == ShipStatus.Destroyed)
+                        return 50f;
+                }
+           } else {
+
+                if (mothership != null)
+                {
+                    mothership.TakeDamage(damage);
+                    if (mothership.team == ShipTeam.Enemy)
+                        TryAppendBattleStatus($"{attacker.Callsign} attacked the Basestar for {damage}!");
+
+                    if (mothership.status == ShipStatus.Destroyed)
+                        return 50f;
+                }
+                if (target != null)
+                {
+                    target.TakeDamage(damage);
+                    TryAppendBattleStatus($"{attacker.Callsign}: {RadioChatter.GetRandomFighterLine()} Attacked {target.Callsign} for {damage}!"); 
+
+                    if (target.status == ShipStatus.Destroyed && target.role == ShipRole.Fighter)
+                        return 10f;
+
+                    return 5f;
+                }
+           }
+        }
+        else
+        {
+            if (target != null)
+            {
+                target.TakeDamage(damage);
+                TryAppendBattleStatus($"{target.Callsign}: {RadioChatter.GetRandomFighterDistressLine()} Attacked {target.Callsign} for {damage}!"); 
+                if (target.status == ShipStatus.Destroyed && target.role == ShipRole.Fighter)
+                    return 10f;
+                return 5f;
+            }
+            if (mothership != null)
+                if (mothership.currentHealth - damage <= 0)
+                {
+                    for (int i = 0; i < allShips.Count; i++)
+                    {
+                        SpaceshipAgent ship = allShips[i];
+                        if (ship.team == ShipTeam.Player && ship.status != ShipStatus.Destroyed)
+                        {
+                            AppendBattleStatus($"{ship.Callsign}: {RadioChatter.GetRandomFighterDefeatedLine()}");
+                            //ship.TakeDamage(100f);
+                        }
+                    }
+                }
+
+                mothership.TakeDamage(damage);
             if (mothership.team == ShipTeam.Player)
                 TryAppendBattleStatus($"{attacker.Callsign} attacked the Galactica for {damage}!");
-            else
-                TryAppendBattleStatus($"{attacker.Callsign} attacked the Basestar for {damage}!");
-
-            if (mothership.status == ShipStatus.Destroyed)
+            if (mothership.status == ShipStatus.Destroyed) {
                 return 50f;
+            }
 
-            return 50f;
+            return 20f;
         } 
-        else if (target != null)
-        {
-            target.TakeDamage(damage);
-            TryAppendBattleStatus($"{attacker.Callsign}: {RadioChatter.GetRandomFighterLine()} Attacked {target.Callsign} for {damage}!"); 
-
-            if (target.status == ShipStatus.Destroyed && target.role == ShipRole.Fighter)
-                return 20f;
-            if (target.status == ShipStatus.Destroyed && target.role == ShipRole.Mothership)
-                return 50f;
-
-            return 10f;
-
-        }
-
         return 3f;
+    }
+
+    public void TogglePlayerPriority() {
+        playerFighterPriority = !playerFighterPriority;
     }
 
     public void TryAppendBattleStatus(string message)

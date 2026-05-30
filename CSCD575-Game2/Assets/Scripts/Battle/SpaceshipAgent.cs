@@ -235,6 +235,14 @@ public class SpaceshipAgent : MonoBehaviour
         status = ShipStatus.Destroyed;
 
         gameObject.SetActive(false);
+
+        // stop all coroutines to end episode
+        StopAllCoroutines();
+    }
+
+    public void StopAllActions()
+    {
+        StopAllCoroutines();
     }
 
     IEnumerator RunEpisode()
