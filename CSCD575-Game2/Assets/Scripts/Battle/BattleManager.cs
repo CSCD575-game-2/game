@@ -61,6 +61,7 @@ public class BattleManager : MonoBehaviour
     //private Transform playerMothership;
     //private Transform enemyMothership;
 
+
     private void Start()
     {
         BeginLevel();
@@ -127,11 +128,18 @@ public class BattleManager : MonoBehaviour
         if (fighterActive == 0 && fighterDocked == 0
             && resupplyActive == 0 && resupplyDocked == 0)
         {
+            battleEnvironment.TryAppendBattleStatus("All fighters are lost!");
             GameOver(false);
         }
         if (enemyFightersActive == 0 && enemyFightersDocked == 0)
         {
+            battleEnvironment.TryAppendBattleStatus("All enemy fighters are destroyed!");
             GameOver(true);
+        }
+
+        if (resupplyActive == 0 && resupplyDocked == 0)
+        {
+            battleEnvironment.TryAppendBattleStatus("All resupply ships are lost!");
         }
 
         fleetStatusText.text =
@@ -444,7 +452,9 @@ public class BattleManager : MonoBehaviour
         enemyMothership.team = ShipTeam.Enemy;
         
         playerMothership.ResetHealth();
+        playerMothership.SetVisible(true);
         enemyMothership.ResetHealth();
+        enemyMothership.SetVisible(true);
 
         playerMothership.status = ShipStatus.Active;
         enemyMothership.status = ShipStatus.Active;
@@ -519,7 +529,7 @@ public class BattleManager : MonoBehaviour
 
         if (ship == null)
         {
-            Debug.Log("No docked fighters available");
+            battleEnvironment.TryAppendBattleStatus("No docked fighters available");
             deployFighterButton.interactable = false;
             return;
         }
@@ -542,6 +552,7 @@ public class BattleManager : MonoBehaviour
             fighterPolicy
         );
 
+        battleEnvironment.TryAppendBattleStatus($"{ship.Callsign} deployed.");
         Debug.Log("Docked fighter deployed");
 
         StartCoroutine(DeployFighterCooldown());
