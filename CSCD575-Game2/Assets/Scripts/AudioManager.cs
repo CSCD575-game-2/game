@@ -35,7 +35,8 @@ public class AudioManager : MonoBehaviour
 
     void Start()
     {
-        musicSource.volume = 0.0f;
+        musicSource.volume = 0.5f;
+        sfxSource.volume = 0.5f;
         PlayMusic();
     }
 
@@ -57,6 +58,11 @@ public class AudioManager : MonoBehaviour
     public void SetVolume(float volume)
     {
         musicSource.volume = volume;
+    }
+
+    public void SetSFXVolume(float volume)
+    {
+        sfxSource.volume = volume;
     }
 
     public void ToggleMute()
@@ -82,5 +88,10 @@ public class AudioManager : MonoBehaviour
     {
         if (explosion != null)
             sfxSource.PlayOneShot(explosion);
+    }
+    public void PlayExplosion(float explosionVolume)
+    {
+        if (explosion != null)
+            sfxSource.PlayOneShot(explosion, explosionVolume);
     }
 }
