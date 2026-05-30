@@ -27,6 +27,14 @@ public class Mothership : MonoBehaviour
         print($"{team} mothership health reset to {maxHealth}");
     }
 
+    public void SetVisible(bool visible)
+    {
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+        {
+            r.enabled = visible;
+        }
+    }
+
     public void TakeDamage(float amount)
     {
         if (status == ShipStatus.Dying || status == ShipStatus.Destroyed)
@@ -38,6 +46,7 @@ public class Mothership : MonoBehaviour
 
         if (newCurrentHealth <= 0f)
         {
+            SetVisible(false);
             status = ShipStatus.Dying;
             Debug.Log($"{team} mothership destroyed");
             ExplodeAndDisappear();
