@@ -11,9 +11,9 @@ public class BattleManager : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private Button startButton;
+    [SerializeField] private Button playerMothershipFireButton;
     [SerializeField] private Button deployFighterButton;
     [SerializeField] private Button deployResupplyButton;
-    //[SerializeField] private Button endBattleButton;
     [SerializeField] private Button togglePriorityButton;
     [SerializeField] private TextMeshProUGUI togglePriorityButtonText;
     [SerializeField] private float togglePriorityCooldown = 2f;
@@ -42,6 +42,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private float spacing = 1.2f;
     [SerializeField] private int startingFighters = 5;
     [SerializeField] private int startingResupplyShips = 2;
+    [SerializeField] private int startingEnemyFightersBase = 5;
     [SerializeField] private int startingEnemyFighters = 5;
     [SerializeField] private Camera battleCamera;
     [SerializeField] private float enemyDeployInterval = 5f;
@@ -68,19 +69,39 @@ public class BattleManager : MonoBehaviour
     private bool togglePriorityOnCooldown;
     private float enemyDeployTimer;
     private BattlePhase phase = BattlePhase.Deployment;
-    //private Transform playerMothership;
-    //private Transform enemyMothership;
+    private float gameOverDelaySeconds = 5f;
 
 
     private void Start()
     {
-        BeginLevel();
+        phase = BattlePhase.Finished;
         InitializeBattleCamera();
+
+        togglePriorityButton.onClick.AddListener(OnTogglePriorityButton);
+        deployFighterButton.onClick.AddListener(DeployFighter);
+        deployResupplyButton.onClick.AddListener(DeployResupply);
+
+        aggressionSlider.onValueChanged.AddListener(UpdateAggression);
+        exploreExploitSlider.onValueChanged.AddListener(UpdateFleetEpsilon);
+        strategicSlider.onValueChanged.AddListener(UpdateFleetGamma);
+        adaptiveSlider.onValueChanged.AddListener(UpdateFleetAlpha);
+
 
         allInButton.onClick.AddListener(SetAllInDoctrine);
         balancedButton.onClick.AddListener(SetBalancedDoctrine);
         cautiousButton.onClick.AddListener(SetCautiousDoctrine);
         adaptiveButton.onClick.AddListener(SetAdaptiveDoctrine);
+        playerMothershipFireButton.onClick.AddListener(OnMothershipFireButton);
+        startButton.onClick.AddListener(BeginLevel);
+
+    }
+
+    public void OnMothershipFireButton()
+    {
+        if (phase != BattlePhase.ActiveBattle)
+            return;
+
+        battleEnvironment.PlayerMothershipFire();
     }
 
     private void SetDoctrine(
@@ -130,6 +151,9 @@ public class BattleManager : MonoBehaviour
 
     private void UpdateFleetStatusText()
     {
+        if (phase == BattlePhase.Finished)
+            return;
+
         int fighterDocked = 0;
         int fighterDestroyed = 0;
         int fighterDisabled = 0;
@@ -188,14 +212,10 @@ public class BattleManager : MonoBehaviour
         if (fighterActive == 0 && fighterDocked == 0
             && resupplyActive == 0 && resupplyDocked == 0)
         {
-            //battleEnvironment.TryAppendBattleStatus("All fighters are lost!");
-            //FinishEpisode();
             GameOver(false);
         }
         if (enemyFightersActive == 0 && enemyFightersDocked == 0)
         {
-            //battleEnvironment.TryAppendBattleStatus("All enemy fighters are destroyed!");
-            //FinishEpisode();
             GameOver(true);
         }
 
@@ -289,30 +309,23 @@ public class BattleManager : MonoBehaviour
 
         deployFighterButton.interactable = false;
         deployResupplyButton.interactable = false;
-        //endBattleButton.interactable = false;
 
-        startButton.onClick.AddListener(StartEpisode);
-        //endBattleButton.onClick.AddListener(EndEpisode);
-        togglePriorityButton.onClick.AddListener(OnTogglePriorityButton);
-        deployFighterButton.onClick.AddListener(DeployFighter);
-        deployResupplyButton.onClick.AddListener(DeployResupply);
-
-        aggressionSlider.onValueChanged.AddListener(UpdateAggression);
-        exploreExploitSlider.onValueChanged.AddListener(UpdateFleetEpsilon);
-        strategicSlider.onValueChanged.AddListener(UpdateFleetGamma);
-        adaptiveSlider.onValueChanged.AddListener(UpdateFleetAlpha);
 
         battleEnvironment.SetPlayerAggression(aggressionSlider.value);
+
+        gameOverStatusText.text = "";
+        phase = BattlePhase.ActiveBattle;
+        startButton.gameObject.SetActive(false);
+        deployFighterButton.interactable = true;
+        deployResupplyButton.interactable = true;
+        battleEnvironment.SetEnemyAggression(enemyStartingAggression);
+
 
     }
 
 
     private void Update()
     {
-        //if (phase == BattlePhase.Recall && AllShipsTerminal())
-        //{
-            //FinishEpisode();
-        //}
         if (phase == BattlePhase.ActiveBattle)
         {
             float nextEnemyAggression =
@@ -353,14 +366,16 @@ public class BattleManager : MonoBehaviour
 
     private void GameOver(bool playerWon)
     {
+
         if (phase == BattlePhase.Finished)
             return;
         phase = BattlePhase.Finished;
 
-        startButton.interactable = true;
+        enemyDeployTimer = 0f;
+
+        startButton.gameObject.SetActive(true);
         deployFighterButton.interactable = false;
         deployResupplyButton.interactable = false;
-        //endBattleButton.interactable = false;
 
         Debug.Log(playerWon ? "Victory!" : "Defeat!");
 
@@ -375,6 +390,7 @@ public class BattleManager : MonoBehaviour
             gameOverStatusText.text = "GAME OVER";
             currentLevel = 1;
         }
+
         FinishEpisode();
         
     }
@@ -408,6 +424,13 @@ public class BattleManager : MonoBehaviour
                 Quaternion.identity
             );
 
+            TDPolicy fighterPolicy = new TDPolicy(
+                alpha: adaptiveSlider.value,
+                gamma: strategicSlider.value,
+                epsilon: exploreExploitSlider.value
+            );
+            ship.fighterPolicy = fighterPolicy;
+
             ship.role = ShipRole.Fighter;
             ship.status = ShipStatus.Docked;
             ship.team = ShipTeam.Player;
@@ -426,6 +449,14 @@ public class BattleManager : MonoBehaviour
                 Quaternion.identity
             );
 
+            ResupplyTDPolicy resupplyPolicy = new ResupplyTDPolicy(
+                alpha: adaptiveSlider.value,
+                gamma: strategicSlider.value,
+                epsilon: exploreExploitSlider.value
+            );
+            ship.resupplyPolicy = resupplyPolicy;
+
+
             ship.role = ShipRole.Resupply;
             ship.status = ShipStatus.Docked;
             ship.team = ShipTeam.Player;
@@ -440,8 +471,14 @@ public class BattleManager : MonoBehaviour
 
 
     private void CreateFleets() {
-        // first delete any existing enemy fighters from previous levels
-        battleEnvironment.ResetEnvironment();
+        // first delete any existing enemy fighters from previous levels or all if player lost
+        
+        if (currentLevel == 1) {
+            battleEnvironment.ResetEnvironmentLevel1();
+            startingEnemyFighters = startingEnemyFightersBase;
+        } else {
+            battleEnvironment.ResetEnvironment();
+        }
 
         CreateStartingFleet();
         CreateEnemyFleet();
@@ -460,6 +497,14 @@ public class BattleManager : MonoBehaviour
                 ),
                 Quaternion.identity
             );
+
+            TDPolicy enemyPolicy = new TDPolicy(
+                    alpha: 0.2f,
+                    gamma: 0.9f,
+                    epsilon: 0.1f
+                    );
+            ship.fighterPolicy = enemyPolicy;
+
 
             ship.role = ShipRole.Fighter;
             ship.team = ShipTeam.Enemy;
@@ -490,19 +535,19 @@ public class BattleManager : MonoBehaviour
     {
         phase = BattlePhase.Finished;
 
-        startButton.interactable = true;
         deployFighterButton.interactable = false;
         deployResupplyButton.interactable = false;
-        //endBattleButton.interactable = false;
-        //
-
+        
+        
         foreach (SpaceshipAgent ship in battleEnvironment.allShips)
         {
             ship.StopAllActions();
         }
 
         Debug.Log("Episode finished. Buttons reset.");
+
     }
+
 
     private void UpdateFleetEpsilon(float value)
     {
@@ -514,11 +559,11 @@ public class BattleManager : MonoBehaviour
 
             if (ship.FighterPolicy is TDPolicy tdPolicy)
             {
-                tdPolicy.Epsilon = -value;
+                tdPolicy.Epsilon = value;
             }
             if (ship.ResupplyPolicy is ResupplyTDPolicy resupplyPolicy)
             {
-                resupplyPolicy.Epsilon = -value;
+                resupplyPolicy.Epsilon = value;
             }
         }
     }
@@ -591,46 +636,15 @@ public class BattleManager : MonoBehaviour
 
     public void StartEpisode()
     {
-        BeginLevel();
         gameOverStatusText.text = "";
-
         phase = BattlePhase.ActiveBattle;
-
-        //battleEnvironment.SetAttackGoal();
-
-        startButton.interactable = false;
-        //endBattleButton.interactable = true;
+        startButton.gameObject.SetActive(false);
         deployFighterButton.interactable = true;
         deployResupplyButton.interactable = true;
-
         battleEnvironment.SetEnemyAggression(enemyStartingAggression);
 
-        Debug.Log("Episode started: goal is enemy mothership");
-        //Debug.Log($"CurrentPlayerGoal: {battleEnvironment.CurrentPlayerGoal}");
-        //Debug.Log($"CurrentEnemyGoal: {battleEnvironment.CurrentEnemyGoal}");
     }
 
-    public void EndEpisode()
-    {
-        phase = BattlePhase.Recall;
-
-        //battleEnvironment.SetReturnHomeGoal();
-
-        deployFighterButton.interactable = false;
-        deployResupplyButton.interactable = false;
-        //endBattleButton.interactable = false;
-
-        foreach (SpaceshipAgent ship in battleEnvironment.allShips)
-        {
-            if (ship.status == ShipStatus.Active)
-            {
-                ship.directive = ShipDirective.ReturnHome;
-                ship.status = ShipStatus.ReturningHome;
-            }
-        }
-
-        Debug.Log("Recall ordered: goal is player mothership");
-    }
 
     public void DeployFighter()
     {
@@ -650,11 +664,8 @@ public class BattleManager : MonoBehaviour
             return;
         }
 
-        TDPolicy fighterPolicy = new TDPolicy(
-            alpha: adaptiveSlider.value,
-            gamma: strategicSlider.value,
-            epsilon: exploreExploitSlider.value
-        );
+
+        TDPolicy fighterPolicy = ship.FighterPolicy;
 
         ship.gameObject.SetActive(true);
 
@@ -711,11 +722,8 @@ public class BattleManager : MonoBehaviour
             return;
         }
 
-        ResupplyTDPolicy resupplyPolicy = new ResupplyTDPolicy(
-            alpha: adaptiveSlider.value,
-            gamma: strategicSlider.value,
-            epsilon: exploreExploitSlider.value
-        );
+        ResupplyTDPolicy resupplyPolicy = ship.ResupplyPolicy;
+
 
         ship.gameObject.SetActive(true);
 
@@ -769,11 +777,7 @@ public class BattleManager : MonoBehaviour
         if (ship == null)
             return;
 
-        TDPolicy enemyPolicy = new TDPolicy(
-            alpha: 0.2f,
-            gamma: 0.9f,
-            epsilon: 0.1f
-        );
+        TDPolicy enemyPolicy = ship.FighterPolicy;
 
         ship.gameObject.SetActive(true);
 

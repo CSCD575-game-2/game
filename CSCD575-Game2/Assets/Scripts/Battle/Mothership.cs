@@ -14,15 +14,29 @@ public class Mothership : MonoBehaviour
     public ShipTeam team;
     public float HealthPercent => currentHealth / maxHealth;
     public bool IsDestroyed => status == ShipStatus.Destroyed;
+
+    [SerializeField] private int maxAmmo = 5;
+    private int currentAmmo;
+
+    public int CurrentAmmo => currentAmmo;
+    public bool HasAmmo => currentAmmo > 0;
+
     private void Awake()
     {
+        currentAmmo = maxAmmo;
         currentHealth = maxHealth;
         status = ShipStatus.Active;
+    }
+
+    public void UseAmmo(int amount)
+    {
+        currentAmmo = Mathf.Max(0, currentAmmo - amount);
     }
 
     public void ResetHealth()
     {
         currentHealth = maxHealth;
+        currentAmmo = maxAmmo;
         status = ShipStatus.Active;
         print($"{team} mothership health reset to {maxHealth}");
     }

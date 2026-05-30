@@ -38,6 +38,9 @@ public class BattleEnvironment : MonoBehaviour
     [SerializeField] private float resupplyEffectTime = 0.25f;
     private Coroutine resupplyEffectCoroutine;
 
+    [SerializeField] private GameObject attackBeamPrefab;
+    [SerializeField] private float beamLifetime = 0.5f;
+
     public static class RadioChatter
     {
         private static readonly string[] fighterLines =
@@ -49,25 +52,134 @@ public class BattleEnvironment : MonoBehaviour
             "KILL KILL KILL!",
             "Die muthafucka!",
             "Boom goes the dynamite!",
-            "Another one bites the dust!"
+            "Another one bites the dust!",
+            "Bullseye!",
+            "That one's finished!",
+            "Send another!",
+            "Target obliterated!",
+            "He's done!",
+            "Back to the scrapyard!",
+            "Nothing but debris now!",
+            "Burn, you toaster!",
+            "Take that, tin can!",
+            "Enemy fighter neutralized!",
+            "That was too easy!",
+            "Another drone bites the dust!",
+            "Right through the cockpit!",
+            "Enemy fighter disintegrating!",
+            "Target reduced to atoms!",
+            "Got him dead center!",
+            "Target is history!",
+            "That's a confirmed kill!",
+            "Drone turned into confetti!",
+            "I barely had to aim!",
+            "Enemy fighter shattered!",
+            "That's what you get!",
+            "Target terminated!",
+            "Another victory for the fleet!",
+            "Enemy ship destroyed!",
+            "Drone eradicated!",
+            "One shot, one kill!",
+            "That's going on my scorecard!",
+            "I got another one!",
+            "Target annihilated!",
+            "Enemy fighter is breaking up!",
+            "Nothing left but wreckage!",
+            "That drone never saw it coming!",
+            "Send me a real challenge!",
+            "Easy kill!",
+            "Target extinguished!",
+            "Another machine bites the vacuum!",
         };
         private static readonly string[] fighterDistressLines =
         {
             "I'm hit!",
-            "I can't hold them off!",
+            "Taking heavy fire!",
+            "I can't shake him!",
             "Mayday! Mayday!",
-            "I'm going down!",
+            "Need assistance!",
+            "I'm losing control!",
+            "Systems failing!",
+            "I'm taking damage!",
+            "I've got multiple contacts on me!",
+            "Where's my wingman?!",
+            "Shields are gone!",
+            "Hull breach!",
+            "I've lost engine power!",
+            "My controls are locked up!",
+            "They're all over me!",
+            "I need support now!",
+            "I can't hold them off!",
+            "I'm not gonna make it!",
+            "This is it for me!",
             "Tell my wife I love her!",
-            "This is it for me!"
+            "Tell my kids I fought well!",
+            "Good hunting, boys.",
+            "It's been an honor flying with you.",
+            "I regret nothing!",
+            "At least take one with me!",
+            "Not like this!",
+            "I'm venting atmosphere!",
+            "I'm losing altitude!",
+            "I can't recover!",
+            "They got me!",
+            "I've taken critical damage!",
+            "I've lost weapons!",
+            "Everything's on fire!",
+            "This bird's finished!",
+            "Somebody get these drones off me!",
+            "I need a resupply ship!",
+            "I'm out of options!",
+            "Commander, we've got a problem!",
+            "I can see the stars through the hull!",
+            "I think they got my reactor!",
+            "We're done for!",
+            "See you on the other side!",
+            "For the fleet!",
+            "For humanity!"
         };
-
         private static readonly string[] fighterDefeatedLines =
         {
             "NOOOOOOOOOOOOO...",
-            "Guys I just want to say that I'm the one who clogged the toilet...",
             "Tell my family I love them...",
             "I can't go on...",
             "Welp, this is awkward...",
+            "Guys, I just want to say I'm the one who clogged the toilet...",
+            "I've made a terrible mistake.",
+            "This wasn't in the flight manual!",
+            "I knew I should have stayed in the simulator.",
+            "At least I won't have to do paperwork.",
+            "Remember me as a hero!",
+            "I'm becoming one with the stars.",
+            "Tell Commander Adama this is entirely his fault.",
+            "I regret nothing!",
+            "Actually, I regret several things.",
+            "I can see my house from here!",
+            "My ship appears to be on fire.",
+            "Good luck, you're gonna need it.",
+            "Well, that's not ideal.",
+            "The drones are cheating!",
+            "I was having such a good day, too.",
+            "I should have called in sick.",
+            "Tell my wingman he still owes me twenty credits.",
+            "I've got a bad feeling about this...",
+            "I don't think that's supposed to happen.",
+            "One day from retirement...",
+            "I never liked this ship anyway.",
+            "If anybody asks, I got at least three of them.",
+            "I blame the engineers.",
+            "I blame the commander.",
+            "I blame myself.",
+            "Mostly the commander, though.",
+            "May my kill count live on!",
+            "This is not how I imagined my promotion.",
+            "Well... frak.",
+            "The stars are beautiful tonight.",
+            "Goodbye, cruel vacuum.",
+            "I think I just hit something important.",
+            "I've lost everything except my sense of humor.",
+            "Don't let them turn my bunk into storage.",
+            "See you all on the other side."
         };
 
         private static readonly string[] fighterBoastLines =
@@ -76,9 +188,48 @@ public class BattleEnvironment : MonoBehaviour
             "Too easy!",
             "Another toaster for the pile!",
             "You'll have to do better than that!",
-            "My grandma hits harder than you!"
+            "My grandma hits harder than you!",
+            "Come on, fight back!",
+            "You're making this too easy!",
+            "I almost feel bad about that one.",
+            "Almost.",
+            "Did they train you in a scrapyard?",
+            "I've seen better flying from cargo haulers.",
+            "You're outmatched, drone.",
+            "I could do this all day.",
+            "Target practice complete.",
+            "That barely counts as a kill.",
+            "Send me a real pilot!",
+            "I hope they built more of you.",
+            "That's another mark on my hull.",
+            "You picked the wrong fleet.",
+            "Who's next?",
+            "I'm just getting started.",
+            "You call that evasive maneuvering?",
+            "My targeting computer is getting bored.",
+            "I didn't even break formation.",
+            "One shot. One kill.",
+            "Too slow!",
+            "Try harder!",
+            "Back to the factory with you.",
+            "I expected more resistance.",
+            "Another victory for the good guys.",
+            "You flew right into that one.",
+            "That was embarrassing.",
+            "I think that drone was already broken.",
+            "That kill belongs in the academy textbooks.",
+            "I'm making this look easy.",
+            "Commander better be writing this down.",
+            "That's going on my scorecard.",
+            "The fleet owes me a medal.",
+            "I'm carrying this battle.",
+            "Just another day in the cockpit.",
+            "I haven't even warmed up yet.",
+            "You're flying like a recruit.",
+            "You should've stayed docked.",
+            "Looks like I'm buying drinks tonight.",
+            "King of the skies, reporting in."
         };
-
         public static string GetRandomFighterLine()
         {
             return fighterLines[Random.Range(0, fighterLines.Length)];
@@ -168,6 +319,59 @@ public class BattleEnvironment : MonoBehaviour
                 DockShip(ship);
             }
         }
+
+
+    }
+
+    public void ResetEnvironmentLevel1()
+    {
+        battleStatusText.text = "";
+        for (int i = allShips.Count - 1; i >= 0; i--)
+        {
+            SpaceshipAgent ship = allShips[i];
+            if (ship != null && ship.status == ShipStatus.Destroyed)
+            {
+                Destroy(ship.gameObject);
+                allShips.RemoveAt(i);
+            }
+            else
+            {
+                DockShip(ship);
+            }
+        }
+        for (int i = dockedFighters.Count - 1; i >= 0; i--)
+        {
+            SpaceshipAgent ship = dockedFighters[i];
+            if (ship != null && ship.status == ShipStatus.Destroyed)
+            {
+                Destroy(ship.gameObject);
+                dockedFighters.RemoveAt(i);
+            }
+        }
+        for (int i = dockedEnemyFighters.Count - 1; i >= 0; i--)
+        {            SpaceshipAgent ship = dockedEnemyFighters[i];
+            if (ship != null && ship.status == ShipStatus.Destroyed)
+            {                
+                Destroy(ship.gameObject);
+                dockedEnemyFighters.RemoveAt(i);
+
+            }
+        }
+        for (int i = dockedResupplyShips.Count - 1; i >= 0; i--)
+        {
+            SpaceshipAgent ship = dockedResupplyShips[i];
+            if (ship != null && ship.status == ShipStatus.Destroyed)
+            {
+                Destroy(ship.gameObject);
+                dockedResupplyShips.RemoveAt(i);
+            }
+        }
+        dockedFighters.Clear();
+        dockedEnemyFighters.Clear();
+        dockedResupplyShips.Clear();
+        allShips.Clear();
+
+
     }
 
     public void DockShip(SpaceshipAgent ship) {
@@ -285,6 +489,7 @@ public class BattleEnvironment : MonoBehaviour
             !dockedFighters.Contains(ship))
         {
             dockedFighters.Add(ship);
+
         }
 
         if (ship.role == ShipRole.Fighter &&
@@ -302,6 +507,7 @@ public class BattleEnvironment : MonoBehaviour
         {
             dockedResupplyShips.Add(ship);
         }
+
     }
 
     public void UnregisterShip(SpaceshipAgent ship)
@@ -775,8 +981,8 @@ public class BattleEnvironment : MonoBehaviour
         if (target == null)
             return -1f;
 
-        target.Refuel(25f);
-        target.Repair(25f);
+        target.Refuel(0.5f);
+        target.Repair(0.75f);
         PlayResupplyEffect(supplier.transform.position, target.transform.position);
 
         if (target.role == ShipRole.Fighter)
@@ -986,5 +1192,71 @@ public class BattleEnvironment : MonoBehaviour
         }
 
         return false;
+    }
+    public void PlayerMothershipFire()
+    {
+        if (!playerMothership.HasAmmo)
+        {
+            AppendBattleStatus("Mothership batteries depleted.");
+            return;
+        }
+
+        GridPosition pos = playerMothershipPosition;
+
+        GridPosition[] targets =
+        {
+            new GridPosition(pos.x - 1, pos.y, pos.z),
+            new GridPosition(pos.x + 1, pos.y, pos.z),
+            new GridPosition(pos.x, pos.y, pos.z + 1),
+            new GridPosition(pos.x, pos.y, pos.z - 1),
+        };
+
+        bool hitSomething = false;
+
+        foreach (GridPosition targetPos in targets)
+        {
+            SpaceshipAgent target = GetShipAtPosition(targetPos, ShipTeam.Player);
+
+            if (target == null)
+                continue;
+
+            PlayMothershipAttackEffect(GridToWorld(targetPos));
+
+            target.TakeDamage(50f);
+            hitSomething = true;
+
+            AppendBattleStatus($"Mothership fired on {target.Callsign}.");
+        }
+
+        playerMothership.UseAmmo(1);
+
+        if (!hitSomething)
+            AppendBattleStatus("Mothership fired. No targets in range.");
+    }
+
+
+    public void PlayMothershipAttackEffect(Vector3 targetWorldPos)
+    {
+        //StartCoroutine(AttackEffect(targetWorldPos));
+
+        Vector3 start = transform.position;
+        Vector3 end = targetWorldPos;
+
+        Vector3 midpoint = (start + end) * 0.5f;
+        Vector3 direction = end - start;
+
+        GameObject beam = Instantiate(
+            attackBeamPrefab,
+            midpoint,
+            Quaternion.LookRotation(direction.normalized)
+        );
+
+        beam.transform.localScale = new Vector3(
+            0.2f,
+            0.2f,
+            direction.magnitude
+        );
+
+        Destroy(beam, beamLifetime);
     }
 }

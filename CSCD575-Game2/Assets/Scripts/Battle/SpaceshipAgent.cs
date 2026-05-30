@@ -5,8 +5,8 @@ public class SpaceshipAgent : MonoBehaviour
 {
     public BattleEnvironment env;
 
-    private TDPolicy fighterPolicy;
-    private ResupplyTDPolicy resupplyPolicy;
+    public TDPolicy fighterPolicy;
+    public ResupplyTDPolicy resupplyPolicy;
 
     public TDPolicy FighterPolicy => fighterPolicy; 
     public ResupplyTDPolicy ResupplyPolicy => resupplyPolicy;
@@ -168,7 +168,9 @@ public class SpaceshipAgent : MonoBehaviour
 
         currentState = startState;
         transform.position = env.GridToWorld(currentState);
-        Callsign = Callsigns.GetRandom();
+        //Callsign = Callsigns.GetRandom();
+        if (string.IsNullOrEmpty(callsign) && team == ShipTeam.Player)
+            Callsign = Callsigns.GetRandom();
 
         episodeCoroutine = StartCoroutine(RunEpisode());
     }
@@ -194,12 +196,15 @@ public class SpaceshipAgent : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
+        if (status == ShipStatus.Destroyed || status == ShipStatus.Dying)
+            return;
         currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
         Debug.Log($"{role} took {amount} damage, health now {currentHealth}/{maxHealth}");
 
         if (currentHealth <= 0f)
         {
+            status = ShipStatus.Dying;
             ExplodeAndDisappear();
 
             if (AudioManager.Instance != null)
@@ -524,22 +529,24 @@ public class SpaceshipAgent : MonoBehaviour
     public void Refuel(float amount)
     {
         ShipStatus prevStatus = status;
-        stepsUsed = Mathf.Max(0, stepsUsed - Mathf.RoundToInt(amount * maxSteps));
-        if (stepsUsed > 0) {
+
+        stepsUsed = Mathf.Max(
+            0,
+            stepsUsed - Mathf.RoundToInt(amount * maxSteps)
+        );
+
+        if (prevStatus == ShipStatus.Disabled && stepsUsed < maxSteps)
+        {
             status = ShipStatus.Active;
-        }
-        if (prevStatus == ShipStatus.Disabled && stepsUsed <= 0) {
             Debug.Log($"{role} refueled and reactivated");
             episodeCoroutine = StartCoroutine(RunEpisode());
         }
-    }
+    }    
     public void Repair(float amount)
     {
         currentHealth += amount * maxHealth;
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
-        if (currentHealth > 0f) {
-            status = ShipStatus.Active;
-        }
+
     }
 
     public void DockForNextLevel(
