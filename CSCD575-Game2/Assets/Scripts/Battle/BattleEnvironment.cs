@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+using TMPro;
 
 public class BattleEnvironment : MonoBehaviour
 {
@@ -33,6 +34,30 @@ public class BattleEnvironment : MonoBehaviour
     [SerializeField] private LineRenderer resupplyLine;
     [SerializeField] private float resupplyEffectTime = 0.25f;
     private Coroutine resupplyEffectCoroutine;
+
+    public static class RadioChatter
+    {
+        private static readonly string[] fighterLines =
+        {
+            "Contact!",
+            "Weapons hot!",
+            "Target acquired.",
+            "Scratch one drone.",
+            "KILL KILL KILL!",
+            "Die muthafucka!",
+            "Boom goes the dynamite!",
+            "Another one bites the dust!"
+        };
+
+        public static string GetRandomFighterLine()
+        {
+            return fighterLines[Random.Range(0, fighterLines.Length)];
+        }
+    }
+    private float nextRadioMessageTime = 0f;
+    [SerializeField] private float radioMessageCooldown = 0.5f;
+
+    [SerializeField] private TextMeshProUGUI battleStatusText;
 
 
     public void Initialize(int sizeX, int sizeY, int sizeZ, float tileSpacing)
@@ -576,11 +601,16 @@ public class BattleEnvironment : MonoBehaviour
                 //$", Action: {action}, TargetPos: {targetPos}" +
                 //$", Target: {(target != null ? target.name + "-" + target.ID + "(" + target.status + ")": "None")}" +
                 //$", Mothership: {(mothership != null ? mothership.name : "None")}");
-
+        
+        float damage = 25f;
 
         if (mothership != null)
         {
-            mothership.TakeDamage(25f);
+            mothership.TakeDamage(damage);
+            if (mothership.team == ShipTeam.Player)
+                TryAppendBattleStatus($"{attacker.Callsign} attacked the Galactica for {damage}!");
+            else
+                TryAppendBattleStatus($"{attacker.Callsign} attacked the Basestar for {damage}!");
 
             if (mothership.status == ShipStatus.Destroyed)
                 return 50f;
@@ -589,7 +619,8 @@ public class BattleEnvironment : MonoBehaviour
         } 
         else if (target != null)
         {
-            target.TakeDamage(25f);
+            target.TakeDamage(damage);
+            TryAppendBattleStatus($"{attacker.Callsign}: {RadioChatter.GetRandomFighterLine()} Attacked {target.Callsign} for {damage}!"); 
 
             if (target.status == ShipStatus.Destroyed && target.role == ShipRole.Fighter)
                 return 20f;
@@ -601,6 +632,30 @@ public class BattleEnvironment : MonoBehaviour
         }
 
         return 3f;
+    }
+
+    public void TryAppendBattleStatus(string message)
+    {
+        if (Time.time < nextRadioMessageTime)
+            return;
+
+        nextRadioMessageTime =
+            Time.time + radioMessageCooldown;
+
+        AppendBattleStatus(message);
+    }
+
+    public void AppendBattleStatus(string message)
+    {
+        string existingText = battleStatusText.text;
+        battleStatusText.text = $"{existingText}\n{message}";
+
+        // take last 5 lines
+        string[] lines = battleStatusText.text.Split('\n');
+        if (lines.Length > 5)
+        {
+            battleStatusText.text = string.Join("\n", lines[^5..]);
+        }
     }
     
     public float ResolveResupply(SpaceshipAgent supplier, string action)
