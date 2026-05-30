@@ -20,6 +20,22 @@ public class SpaceshipAgent : MonoBehaviour
     private int id;
     public int ID => id;
 
+    [SerializeField] private string callsign;
+    public string Callsign
+    {
+        get
+        {
+            if (team == ShipTeam.Enemy)
+                return $"Drone{ID % 1000}";
+
+            return callsign;
+        }
+        private set => callsign = value;
+    }
+
+    [SerializeField] private GameObject attackBeamPrefab;
+    [SerializeField] private float beamLifetime = 0.1f;
+
     [SerializeField] private float lowFuelHelpThreshold = 0.3f;
 
     [SerializeField] private int maxSteps = 100;
@@ -57,9 +73,71 @@ public class SpaceshipAgent : MonoBehaviour
 
     private Coroutine episodeCoroutine;
 
+    public static class Callsigns
+    {
+        private static readonly string[] names =
+        {
+            "Apollo",
+            "Starbuck",
+            "Boomer",
+            "Hotdog",
+            "Racetrack",
+            "Kat",
+            "Helo",
+            "Bulldog",
+            "Ghost",
+            "Viper",
+            "Mako",
+            "Falcon",
+            "Nova",
+            "Phoenix",
+            "Raven",
+            "Specter",
+            "Maverick",
+            "Bandit",
+            "Valkyrie",
+            "Hammer",
+            "Reaper",
+            "Titan",
+            "Blaze",
+            "Shadow",
+            "Comet",
+            "Orion",
+            "Wolf",
+            "Kodiak",
+            "Jaguar",
+            "Thunder"
+        };
+
+        public static string GetRandom()
+        {
+            return names[Random.Range(0, names.Length)];
+        }
+    }
+
     public void PlayAttackEffect(Vector3 targetWorldPos)
     {
         StartCoroutine(AttackEffect(targetWorldPos));
+
+        Vector3 start = transform.position;
+        Vector3 end = targetWorldPos;
+
+        Vector3 midpoint = (start + end) * 0.5f;
+        Vector3 direction = end - start;
+
+        GameObject beam = Instantiate(
+            attackBeamPrefab,
+            midpoint,
+            Quaternion.LookRotation(direction.normalized)
+        );
+
+        beam.transform.localScale = new Vector3(
+            0.2f,
+            0.2f,
+            direction.magnitude
+        );
+
+        Destroy(beam, beamLifetime);
     }
 
 
@@ -68,6 +146,8 @@ public class SpaceshipAgent : MonoBehaviour
         attackLine.enabled = true;
         attackLine.SetPosition(0, transform.position);
         attackLine.SetPosition(1, targetWorldPos);
+        //attackLine.startWidth = 0.35f;
+        //attackLine.endWidth = 0.05f;
 
         yield return new WaitForSeconds(attackEffectTime);
 
@@ -88,6 +168,7 @@ public class SpaceshipAgent : MonoBehaviour
 
         currentState = startState;
         transform.position = env.GridToWorld(currentState);
+        Callsign = Callsigns.GetRandom();
 
         episodeCoroutine = StartCoroutine(RunEpisode());
     }
