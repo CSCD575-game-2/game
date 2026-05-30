@@ -9,7 +9,7 @@ public class Mothership : MonoBehaviour
     [SerializeField] private GameObject finalMegaExplosionPrefab;
     public ShipStatus status;
 
-    private float currentHealth;
+    public float currentHealth;
 
     public ShipTeam team;
     public float HealthPercent => currentHealth / maxHealth;
