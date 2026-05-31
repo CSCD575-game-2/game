@@ -36,7 +36,7 @@ public class MainMenuUI : MonoBehaviour
         OnCreditsDisable();
         OnQuitDisable();
         OnNewGameDisable();
-        loader.LoadByName("Main");
+        loader.LoadByName("Tutorial");
     }
 
     private void OnNewGameDisable()
