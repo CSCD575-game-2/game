@@ -62,6 +62,11 @@ public class Mothership : MonoBehaviour
         {
             SetVisible(false);
             status = ShipStatus.Dying;
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayExplosion(5.0f);
+            }
+
             Debug.Log($"{team} mothership destroyed");
             ExplodeAndDisappear();
         }

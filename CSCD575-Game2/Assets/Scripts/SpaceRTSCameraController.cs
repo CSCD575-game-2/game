@@ -48,6 +48,10 @@ public class SpaceRTSCameraController : MonoBehaviour
         int maxSize = Mathf.Max(gm.GetSizeX(), gm.GetSizeY(), gm.GetSizeZ());
         orbitDistance = gm.GetSpacing() *  maxSize * 1.5f;
         orbitHeight = orbitDistance * 0.5f;
+
+        Vector3 center = GetBattleCenter();
+        Vector3 playerDir = (playerMothership.position - center).normalized;
+        orbitAngle = Mathf.Atan2(playerDir.z, playerDir.x) * Mathf.Rad2Deg;
     }
 
     private void Update()
@@ -85,9 +89,12 @@ public class SpaceRTSCameraController : MonoBehaviour
 
         float radians = orbitAngle * Mathf.Deg2Rad;
 
+        // Slight vertical bob
+        float height = orbitHeight + Mathf.Sin(Time.time * 0.5f) * 20f;
+
         Vector3 offset = new Vector3(
                 Mathf.Cos(radians) * orbitDistance,
-                orbitHeight,
+                height,
                 Mathf.Sin(radians) * orbitDistance
                 );
 

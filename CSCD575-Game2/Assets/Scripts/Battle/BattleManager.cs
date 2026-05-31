@@ -23,6 +23,13 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Button balancedButton;
     [SerializeField] private Button cautiousButton;
     [SerializeField] private Button adaptiveButton;
+    [SerializeField] private TextMeshProUGUI allInStatusText;
+    [SerializeField] private TextMeshProUGUI balancedStatusText;
+    [SerializeField] private TextMeshProUGUI cautiousStatusText;
+    [SerializeField] private TextMeshProUGUI adaptiveStatusText;
+    private Color originalTextColor;
+    public Color selectedTextColor = Color.black;
+
     [SerializeField] private TextMeshProUGUI fleetStatusText;
     [SerializeField] private TextMeshProUGUI enemyFleetStatusText;
     [SerializeField] private TextMeshProUGUI gameOverStatusText;
@@ -64,6 +71,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private int currentLevel = 1;
     [SerializeField] private int enemyFightersPerLevel = 3;
 
+
     private bool deployResupplyOnCooldown;
     private bool deployFighterOnCooldown;
     private bool togglePriorityOnCooldown;
@@ -94,6 +102,19 @@ public class BattleManager : MonoBehaviour
         playerMothershipFireButton.onClick.AddListener(OnMothershipFireButton);
         startButton.onClick.AddListener(BeginLevel);
 
+        originalTextColor = allInStatusText.color;
+        Debug.Log($"Original text color: {originalTextColor}");
+
+       
+
+    }
+
+    private void ResetPresetTextColors()
+    {
+        allInStatusText.color = originalTextColor;
+        balancedStatusText.color = originalTextColor;
+        cautiousStatusText.color = originalTextColor;
+        adaptiveStatusText.color = originalTextColor;
     }
 
     public void OnMothershipFireButton()
@@ -118,35 +139,44 @@ public class BattleManager : MonoBehaviour
     }
     public void SetAllInDoctrine()
     {
+        ResetPresetTextColors();
+        Debug.Log($"All-In doctrine selected. Setting text color to: {allInStatusText.color}");
         SetDoctrine(
                 aggression: 1.0f,
                 epsilon: 0.05f,
                 gamma: 0.95f,
                 alpha: 0.05f);
+        allInStatusText.color = selectedTextColor;
     }
     public void SetBalancedDoctrine()
     {
+        ResetPresetTextColors();
         SetDoctrine(
             aggression: 0.5f,
             epsilon: 0.15f,
             gamma: 0.80f,
             alpha: 0.20f);
+        balancedStatusText.color = selectedTextColor;
     }
     public void SetCautiousDoctrine()
     {
+        ResetPresetTextColors();
         SetDoctrine(
                 aggression: 0.1f,
                 epsilon: 0.10f,
                 gamma: 0.90f,
                 alpha: 0.10f);
+        cautiousStatusText.color = selectedTextColor;
     }
     public void SetAdaptiveDoctrine()
     {
+        ResetPresetTextColors();
         SetDoctrine(
                 aggression: 0.7f,
                 epsilon: 0.40f,
                 gamma: 0.70f,
                 alpha: 0.40f);
+        adaptiveStatusText.color = selectedTextColor;
     }
 
     private void UpdateFleetStatusText()
@@ -286,13 +316,13 @@ public class BattleManager : MonoBehaviour
         if (battleEnvironment.playerFighterPriority)
         {
             battleEnvironment.AppendBattleStatus("This is Commander Adama. You must neutralize the enemy fighters.");
-            togglePriorityButtonText.text = "TARGET FIGHTERS";
+            togglePriorityButtonText.text = "PRIORITY: FIGHTERS";
 
         }
         else
         {
             battleEnvironment.AppendBattleStatus("This is Commander Adama. KILL THE ENEMY MOTHERSHIP AT ALL COSTS!");
-            togglePriorityButtonText.text = "TARGET BASESTAR";
+            togglePriorityButtonText.text = "PRIORITY: MOTHERSHIP";
         }
         StartCoroutine(TogglePriorityCooldown());
 
@@ -343,6 +373,29 @@ public class BattleManager : MonoBehaviour
                 DeployEnemyFighter();
                 Debug.Log("Enemy aggression: " + battleEnvironment.enemyAggression);
             }
+        }
+        
+        GridPosition pos = battleEnvironment.playerMothershipPosition;
+        GridPosition[] targets =
+        {
+            new GridPosition(pos.x - 1, pos.y, pos.z),
+            new GridPosition(pos.x + 1, pos.y, pos.z),
+            new GridPosition(pos.x, pos.y, pos.z + 1),
+            new GridPosition(pos.x, pos.y, pos.z - 1),
+        };
+        bool hasValidTarget = false;
+        foreach (GridPosition targetPos in targets)
+        {
+            SpaceshipAgent target = battleEnvironment.GetShipAtPosition(targetPos, ShipTeam.Player);
+            if (target != null) {
+                playerMothershipFireButton.interactable = true;
+                hasValidTarget = true;
+                break;
+            }
+        }
+        if (!hasValidTarget)
+        {
+            playerMothershipFireButton.interactable = false;
         }
         
         if (battleEnvironment.playerMothership != null &&
@@ -551,6 +604,7 @@ public class BattleManager : MonoBehaviour
 
     private void UpdateFleetEpsilon(float value)
     {
+        ResetPresetTextColors();
         foreach (SpaceshipAgent ship in battleEnvironment.allShips)
         {
             // Only update player ships
@@ -570,6 +624,7 @@ public class BattleManager : MonoBehaviour
 
     private void UpdateFleetGamma(float value)
     {
+        ResetPresetTextColors();
         foreach (SpaceshipAgent ship in battleEnvironment.allShips)
         {
             // Only update player ships
@@ -589,6 +644,7 @@ public class BattleManager : MonoBehaviour
 
     private void UpdateFleetAlpha(float value)
     {
+        ResetPresetTextColors();
         foreach (SpaceshipAgent ship in battleEnvironment.allShips)
         {
             // Only update player ships
@@ -672,15 +728,19 @@ public class BattleManager : MonoBehaviour
         ship.role = ShipRole.Fighter;
         ship.status = ShipStatus.Active;
         ship.directive = ShipDirective.Attack;
+        
+        GridPosition initialGridPosition = battleEnvironment.playerMothershipPosition;
+        initialGridPosition.x += 0; // next to the mothership
 
         ship.InitializeFighter(
             battleEnvironment,
-            battleEnvironment.playerMothershipPosition,
+            initialGridPosition,
             fighterPolicy
         );
 
         battleEnvironment.TryAppendBattleStatus($"{ship.Callsign} deployed.");
         Debug.Log("Docked fighter deployed");
+
 
         StartCoroutine(DeployFighterCooldown());
     }
@@ -731,9 +791,13 @@ public class BattleManager : MonoBehaviour
         ship.status = ShipStatus.Active;
         ship.directive = ShipDirective.Resupply;
 
+        GridPosition initialGridPosition = battleEnvironment.playerMothershipPosition;
+        initialGridPosition.x += 0; // next to the mothership
+
+
         ship.InitializeResupply(
             battleEnvironment,
-            battleEnvironment.playerMothershipPosition,
+            initialGridPosition,
             resupplyPolicy
         );
 
@@ -767,6 +831,7 @@ public class BattleManager : MonoBehaviour
     private void UpdateAggression(float value)
     {
         battleEnvironment.SetPlayerAggression(value); 
+        ResetPresetTextColors();
     }
 
     private void DeployEnemyFighter()

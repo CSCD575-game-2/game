@@ -636,6 +636,9 @@ public class BattleEnvironment : MonoBehaviour
             string action,
             GridPosition nextState)
     {
+        if (nextState == playerMothershipPosition || nextState == enemyMothershipPosition)
+            return -0.5f;
+
         if (ship.role == ShipRole.Resupply) {
             return GetResupplyMovementReward(ship, state, action, nextState);
         } 
@@ -672,11 +675,10 @@ public class BattleEnvironment : MonoBehaviour
                 );
 
         if (newDistance < oldDistance)
-            reward += 1f;
+            reward += 0.2f;
         else if (newDistance > oldDistance)
-            reward -= 1f;
-        else
             reward -= 0.2f;
+
 
 
         return reward;
@@ -730,9 +732,9 @@ public class BattleEnvironment : MonoBehaviour
             float newDistance = GridDistance(nextState, newTarget.CurrentState);
 
             if (newDistance < oldDistance)
-                reward += 1f;
+                reward += 0.2f;
             else if (newDistance > oldDistance)
-                reward -= 1f;
+                reward -= 0.2f;
         }
 
         reward += CountNearbyFriendlyShips(nextState, ship.team, radius: 2) * 0.2f;
@@ -847,6 +849,18 @@ public class BattleEnvironment : MonoBehaviour
         }
         
         float damage = 25f;
+        damage += Random.Range(-5f, 5f); // add some variability to damage
+        // round damage to nearest 5
+        damage = Mathf.Round(damage / 5f) * 5f;
+
+        bool criticalHit = Random.value < 0.1f; // 10% chance for critical hit
+
+        if (criticalHit)
+        {
+            damage *= 2f;
+            TryAppendBattleStatus($"{attacker.Callsign} scored a CRITICAL HIT!");
+        }
+        
 
         if (attacker.team == ShipTeam.Player) 
         {
@@ -858,7 +872,7 @@ public class BattleEnvironment : MonoBehaviour
                     TryAppendBattleStatus($"{attacker.Callsign}: {RadioChatter.GetRandomFighterLine()} Attacked {target.Callsign} for {damage}!"); 
 
                     if (target.status == ShipStatus.Destroyed && target.role == ShipRole.Fighter)
-                        return 10f;
+                        return 20f;
 
                     return 5f;
 
@@ -870,7 +884,7 @@ public class BattleEnvironment : MonoBehaviour
                         for (int i = 0; i < allShips.Count; i++)
                         {
                             SpaceshipAgent ship = allShips[i];
-                            if (ship.team == ShipTeam.Enemy && ship.status != ShipStatus.Destroyed)
+                            if (ship.team == ShipTeam.Player && ship.status != ShipStatus.Destroyed)
                             {
                                 AppendBattleStatus($"{ship.Callsign}: {RadioChatter.GetRandomFighterBoastLine()}");
                                 //ship.TakeDamage(100f);
@@ -882,26 +896,29 @@ public class BattleEnvironment : MonoBehaviour
                         TryAppendBattleStatus($"{attacker.Callsign} attacked the Basestar for {damage}!");
 
                     if (mothership.status == ShipStatus.Destroyed)
-                        return 50f;
+                        return 100f;
+
+                    return 50f;
                 }
            } else {
 
                 if (mothership != null)
                 {
                     mothership.TakeDamage(damage);
-                    if (mothership.team == ShipTeam.Enemy)
-                        TryAppendBattleStatus($"{attacker.Callsign} attacked the Basestar for {damage}!");
+                    if (mothership.team == ShipTeam.Player)
+                        TryAppendBattleStatus($"{attacker.Callsign} attacked the Mothership for {damage}!");
 
                     if (mothership.status == ShipStatus.Destroyed)
-                        return 50f;
+                        return 100f;
+
+                    return 50f;
                 }
                 if (target != null)
                 {
                     target.TakeDamage(damage);
-                    TryAppendBattleStatus($"{attacker.Callsign}: {RadioChatter.GetRandomFighterLine()} Attacked {target.Callsign} for {damage}!"); 
 
                     if (target.status == ShipStatus.Destroyed && target.role == ShipRole.Fighter)
-                        return 10f;
+                        return 20f;
 
                     return 5f;
                 }
@@ -914,16 +931,19 @@ public class BattleEnvironment : MonoBehaviour
                 target.TakeDamage(damage);
                 TryAppendBattleStatus($"{target.Callsign}: {RadioChatter.GetRandomFighterDistressLine()} Attacked {target.Callsign} for {damage}!"); 
                 if (target.status == ShipStatus.Destroyed && target.role == ShipRole.Fighter)
-                    return 10f;
+                    return 20f;
                 return 5f;
             }
             if (mothership != null)
+            {
                 if (mothership.currentHealth - damage <= 0)
                 {
                     for (int i = 0; i < allShips.Count; i++)
                     {
                         SpaceshipAgent ship = allShips[i];
-                        if (ship.team == ShipTeam.Player && ship.status != ShipStatus.Destroyed)
+                        if (ship.team == ShipTeam.Player && 
+                                ship.status == ShipStatus.Active &&
+                                (ship.Callsign != null || ship.Callsign != ""))
                         {
                             AppendBattleStatus($"{ship.Callsign}: {RadioChatter.GetRandomFighterDefeatedLine()}");
                             //ship.TakeDamage(100f);
@@ -932,13 +952,15 @@ public class BattleEnvironment : MonoBehaviour
                 }
 
                 mothership.TakeDamage(damage);
-            if (mothership.team == ShipTeam.Player)
-                TryAppendBattleStatus($"{attacker.Callsign} attacked the Galactica for {damage}!");
-            if (mothership.status == ShipStatus.Destroyed) {
+                if (mothership.team == ShipTeam.Player)
+                    TryAppendBattleStatus($"{attacker.Callsign} attacked the Galactica for {damage}!");
+                if (mothership.status == ShipStatus.Destroyed) {
+                    return 100f;
+                }
+
                 return 50f;
             }
 
-            return 20f;
         } 
         return 3f;
     }
@@ -1092,7 +1114,7 @@ public class BattleEnvironment : MonoBehaviour
         return null;
     }
 
-    private SpaceshipAgent GetShipAtPosition(GridPosition pos, ShipTeam attackerTeam)
+    public SpaceshipAgent GetShipAtPosition(GridPosition pos, ShipTeam attackerTeam)
     {
         foreach (SpaceshipAgent ship in allShips)
         {
@@ -1197,7 +1219,7 @@ public class BattleEnvironment : MonoBehaviour
     {
         if (!playerMothership.HasAmmo)
         {
-            AppendBattleStatus("Mothership batteries depleted.");
+            AppendBattleStatus("Mothership ammo depleted!");
             return;
         }
 
