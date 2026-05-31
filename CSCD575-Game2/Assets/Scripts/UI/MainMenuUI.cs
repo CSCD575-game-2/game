@@ -12,6 +12,9 @@ public class MainMenuUI : MonoBehaviour
     private Button quit;
     [SerializeField] private SceneLoader loader; // <-- this is so we can load into the main gameplay scene
     [SerializeField] private MainMenuController controller; // <- this is so we can go to the credits scene
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioClip buttonClick;
+
     // private UIDocument uiDoc;
     // private VisualElement root;
     private void OnEnable()
@@ -33,6 +36,7 @@ public class MainMenuUI : MonoBehaviour
     private void OnClickNewGame(ClickEvent clicked)
     {
         // Debug.Log("You pressed new game!");
+        PlaySFX(buttonClick);
         OnCreditsDisable();
         OnQuitDisable();
         OnNewGameDisable();
@@ -48,6 +52,7 @@ public class MainMenuUI : MonoBehaviour
     private void OnClickCredits(ClickEvent clicked)
     {
         // Debug.Log("You pressed credits!");
+        PlaySFX(buttonClick);
         controller.OpenCredits();
     }
 
@@ -60,6 +65,7 @@ public class MainMenuUI : MonoBehaviour
     private void OnClickQuit(ClickEvent clicked)
     {
         // Debug.Log("You pressed quit!");
+        PlaySFX(buttonClick);
         Application.Quit();
     }
 
@@ -67,6 +73,15 @@ public class MainMenuUI : MonoBehaviour
     {
         quit.UnregisterCallback<ClickEvent>(OnClickQuit);
     }
+
+    private void PlaySFX(AudioClip clip)
+    {
+        if (sfxSource && clip)
+        {
+            sfxSource.PlayOneShot(clip);
+        }
+    }
+
 }
 
         /* Old garbage code that was here before I realised I assigned the script to the wrong object */
