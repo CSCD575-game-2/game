@@ -1,7 +1,13 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+
+    [Header("UI")]
+    [SerializeField] private Button quitButton;
+
     [Header("Grid")]
     [SerializeField] private int sizeX = 10;
     [SerializeField] private int sizeY = 1;
@@ -20,6 +26,18 @@ public class GameManager : MonoBehaviour
         battleEnvironment.Initialize(sizeX, sizeY, sizeZ, tileSpacing);
 
         GenerateGrid();
+        quitButton.onClick.AddListener(QuitGame);
+    }
+
+    public void QuitGame()
+    {
+        Debug.Log("Quit Game");
+
+        Application.Quit();
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 
     public float GetSpacing()

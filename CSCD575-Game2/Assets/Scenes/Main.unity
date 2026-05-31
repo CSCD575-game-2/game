@@ -12483,6 +12483,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e05e6d7e931945efbe34c0e756c57a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  quitButton: {fileID: 1586473532}
   sizeX: 2
   sizeY: 2
   sizeZ: 2
