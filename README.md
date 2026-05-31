@@ -9,3 +9,5 @@ Download `SPARTS-Windows.zip`, extract, and run `SPARTS.exe`.
 
 ### macOS
 Download `SPARTS-Mac.zip`, extract, and right-click → Open.
+
+You may need to do this command: `xattr -dr com.apple.quarantine sparts.app`
