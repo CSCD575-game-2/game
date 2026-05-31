@@ -35,7 +35,7 @@ public class AudioManager : MonoBehaviour
 
     void Start()
     {
-        musicSource.volume = 0.5f;
+        musicSource.volume = 0.0f;
         sfxSource.volume = 0.5f;
         PlayMusic();
     }
